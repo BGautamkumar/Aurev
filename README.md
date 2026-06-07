@@ -1,286 +1,227 @@
-# 🌊 Echo - Realtime Chat Platform
+<div align="center">
+  <img src="/frontend/public/screenshot-for-readme.png" alt="AUREV Chat Platform" width="100%" />
+  
+  <br />
+  <br />
 
-![Echo Chat App](/frontend/public/screenshot-for-readme.png)
+  <h1>🌊 AUREV</h1>
+  <p>
+    <b>Momentum Communication Platform</b>
+  </p>
+  <p>
+    A robust, real-time messaging ecosystem engineered for performance, security, and seamless user experience.
+  </p>
 
-> **Experience the future of instant communication with Echo - a beautifully crafted, feature-rich chat application that delivers seamless real-time messaging with the elegance and performance you'd expect from premium platforms.**
+  <div>
+    <img src="https://img.shields.io/badge/React-18.3.1-61DAFB?style=flat-square&logo=react" alt="React" />
+    <img src="https://img.shields.io/badge/Node.js-Express-339933?style=flat-square&logo=node.js" alt="Node.js" />
+    <img src="https://img.shields.io/badge/MongoDB-Mongoose-47A248?style=flat-square&logo=mongodb" alt="MongoDB" />
+    <img src="https://img.shields.io/badge/Socket.io-Realtime-010101?style=flat-square&logo=socket.io" alt="Socket.io" />
+    <img src="https://img.shields.io/badge/TailwindCSS-Styling-06B6D4?style=flat-square&logo=tailwindcss" alt="TailwindCSS" />
+    <img src="https://img.shields.io/badge/Zustand-State-orange?style=flat-square" alt="Zustand" />
+  </div>
+</div>
 
-## 📋 Table of Contents
+---
 
-- [✨ Key Features](#-key-features)
-- [🏗️ Technical Architecture](#️-technical-architecture)
-- [📊 Project Structure](#-project-structure)
-- [🚀 Quick Start](#-quick-start)
-- [📱 Usage](#-usage)
-- [🎯 What Makes Echo Special](#-what-makes-echo-special)
-- [🛣️ Roadmap](#️-roadmap)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
-- [🙏 Acknowledgments](#-acknowledgments)
-- [📞 Support](#-support)
-- [👤 Author & Contact](#-author--contact)
+## 📖 About The Project
 
-## ✨ Key Features
+**AUREV** (formerly Echo) is a full-stack, real-time communication platform designed to demonstrate modern web engineering practices. Built with a focus on **scalability**, **clean architecture**, and **responsive UI**, AUREV goes beyond a simple chat application to provide a comprehensive messaging experience. 
 
-### 🚀 **Core Messaging**
-- **Real-time Messaging** - Instant message delivery with Socket.io
-- **End-to-End Encryption Ready** - Secure communication framework
-- **Message Types** - Text, images, voice messages, and file sharing
-- **Smart Notifications** - Stay informed without being overwhelmed
+For technical recruiters and developers, this project showcases proficiency in:
+- **Full-Stack System Design**: Decoupling frontend and backend logic while maintaining seamless data flow via RESTful APIs and WebSockets.
+- **Real-Time Bidirectional Communication**: Implementing Socket.io for low-latency messaging, typing indicators, and online status tracking.
+- **State Management**: Utilizing Zustand for lightweight, scalable, and predictable global state management in React.
+- **Security & Media Handling**: Implementing JWT-based authentication, password hashing, rate limiting, HTML sanitization, and secure cloud storage integrations (Cloudinary) for media handling.
 
-### 🎨 **User Experience**
-- **iPhone-Level Smoothness** - Optimized animations and transitions
-- **Responsive Design** - Perfect experience on all devices
-- **Dark/Light Themes** - Personalize your viewing experience
-- **Online Status Tracking** - See who's available in real-time
+---
 
-### 🛠 **Advanced Features**
-- **Voice Messaging** - Record and send voice notes
-- **File Sharing** - Share documents, images, and media
-- **Search Functionality** - Find messages instantly
-- **Typing Indicators** - Real-time typing feedback
-- **Message Reactions** - Express yourself with emoji reactions
+## ✨ Features
 
-### 🔐 **Security & Privacy**
-- **JWT Authentication** - Secure user authentication
-- **Privacy Controls** - Manage your data and visibility
-- **Secure File Uploads** - Cloudinary integration for safe media sharing
+### 💬 Core Messaging Experience
+- **Real-Time Communication**: Instant message delivery and event broadcasting via Socket.io.
+- **Rich Media Support**: Seamlessly send text, images, voice recordings, and files.
+- **Interactive Chat**: Real-time typing indicators, read receipts, and message reactions.
 
-## 🏗️ Technical Architecture
+### 🛡️ Security & Reliability
+- **Authentication**: Secure JWT-based authentication with HTTP-only cookies to prevent XSS attacks.
+- **Data Protection**: Passwords hashed using `bcryptjs`; inputs sanitized using `sanitize-html`.
+- **API Protection**: `express-rate-limit` prevents brute-force attacks and abuse.
 
-### **Frontend Stack**
-```
-React 18 + Vite
-├── UI Framework: TailwindCSS + DaisyUI
-├── State Management: Zustand
-├── Routing: React Router v6
-├── Real-time: Socket.io Client
-├── Icons: Lucide React
-└── Notifications: React Hot Toast
-```
+### 🎨 UI & Performance
+- **Fluid Animations**: Leveraging `framer-motion` for buttery-smooth micro-interactions.
+- **Virtualization**: Integrated `react-virtuoso` to efficiently render thousands of messages without DOM bloat.
+- **Theming**: Dynamic Light and Dark modes built with TailwindCSS.
+- **Responsive Layout**: Mobile-first design adapting flawlessly to desktop environments.
 
-### **Backend Stack**
-```
-Node.js + Express
-├── Database: MongoDB with Mongoose
-├── Real-time: Socket.io
-├── Authentication: JWT + bcryptjs
-├── File Storage: Cloudinary
-└── CORS: Secure cross-origin requests
-```
+---
 
-### **Performance Optimizations**
-- ⚡ **Code Splitting** - Lazy loading for faster initial load
-- 🎯 **Component Memoization** - Prevents unnecessary re-renders
-- 🚀 **GPU Acceleration** - Hardware-accelerated animations
-- 📦 **Bundle Optimization** - Optimized chunk splitting
-- 🔧 **Memory Management** - Efficient resource usage
+## 🏗️ System Architecture
 
-## � Project Structure
+AUREV employs a monolithic repository containing separated frontend and backend services.
 
-```
-Echo-chat-app/
-├── 📁 backend/                    # Node.js + Express Server
-│   ├── 📁 src/
-│   │   ├── 📁 controllers/        # Route handlers
-│   │   ├── 📁 lib/               # Utilities & Socket.io setup
-│   │   ├── 📁 middleware/        # Express middleware
-│   │   ├── 📁 models/            # MongoDB schemas
-│   │   ├── 📁 routes/            # API routes
-│   │   ├── 📁 seeds/             # Database seeders
-│   │   └── 📄 index.js           # Server entry point
-│   ├── 📄 .env                   # Environment variables
-│   └── 📄 package.json           # Backend dependencies
-├── 📁 frontend/                   # React + Vite Application
-│   ├── 📁 src/
-│   │   ├── 📁 components/        # Reusable React components
-│   │   ├── 📁 pages/             # Page-level components
-│   │   ├── 📁 store/             # Zustand state management
-│   │   ├── 📁 lib/               # Utilities & API setup
-│   │   ├── 📁 utils/             # Helper functions
-│   │   ├── 📄 App.jsx            # Main application component
-│   │   └── 📄 main.jsx           # Application entry point
-│   ├── 📁 public/                # Static assets
-│   ├── 📄 index.html             # HTML template
-│   └── 📄 package.json           # Frontend dependencies
-├── 📁 Diagram/                    # Project architecture diagrams
-├── 📄 README.md                   # This documentation
-├── 📄 LICENSE                     # Project license
-└── 📄 package.json                # Root package configuration
-```
+- **Frontend (Client)**: A React Single Page Application (SPA) bundled with Vite. It consumes the REST API for static operations (auth, fetching history) and establishes a persistent WebSocket connection for dynamic events.
+- **Backend (Server)**: A Node.js/Express RESTful API server. It acts as the orchestrator for database operations (MongoDB) and manages the Socket.io server to emit realtime events to connected clients.
+- **Storage**: MongoDB stores user metadata and message history, while Cloudinary handles binary media files, ensuring the primary database remains performant.
 
-## � Quick Start
+---
 
-### **Prerequisites**
-- Node.js 16+
-- MongoDB instance
-- Cloudinary account (for file uploads)
+## 🛠️ Technology Stack
 
-### **Installation**
+### Frontend 
+* **Core**: React 18, Vite
+* **State Management**: Zustand
+* **Styling & UI**: TailwindCSS, Framer Motion, Lucide React
+* **Network & Real-time**: Axios, Socket.io-Client
+* **Optimization**: React Virtuoso (List virtualization)
+
+### Backend
+* **Core**: Node.js, Express.js
+* **Database**: MongoDB (Mongoose ORM)
+* **Real-time**: Socket.io
+* **Security & Auth**: JWT, bcryptjs, Express Rate Limit, Sanitize-HTML
+* **Logging & Validation**: Winston (logging), Joi (schema validation)
+* **Storage**: Cloudinary
+
+---
+
+## 🚀 Getting Started
+
+Follow these instructions to set up the project locally for development and testing.
+
+### Prerequisites
+Before you begin, ensure you have the following installed:
+- [Node.js](https://nodejs.org/) (v18.0.0 or higher recommended)
+- [MongoDB](https://www.mongodb.com/) (Local instance or MongoDB Atlas cluster)
+- [Git](https://git-scm.com/)
+- A [Cloudinary](https://cloudinary.com/) account for media uploads
+
+### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/Echo-chat-app.git
-   cd Echo-chat-app
+   git clone https://github.com/yourusername/AUREV.git
+   cd AUREV
    ```
 
-2. **Install dependencies**
+2. **Install Root Dependencies**
+   The project is structured to easily install all dependencies from the root.
    ```bash
    npm run build
    ```
+   *(This script automatically installs dependencies for both `backend` and `frontend`, and builds the frontend).*
 
-3. **Environment Setup**
-   ```bash
-   cp backend/.env.example backend/.env
-   # Edit backend/.env with your credentials
-   ```
+### Configuration
 
-4. **Start the application**
-   ```bash
-   npm start
-   ```
-
-### **Environment Variables**
-
-```env
-# Database
-MONGODB_URI=mongodb://localhost:27017/echo-chat
-PORT=5002
-
-# Security
-JWT_SECRET=your-super-secret-jwt-key
-
-# Cloudinary (File Uploads)
-CLOUDINARY_CLOUD_NAME=your-cloud-name
-CLOUDINARY_API_KEY=your-api-key
-CLOUDINARY_API_SECRET=your-api-secret
-
-# Environment
-NODE_ENV=development
-```
-
-## 📱 Usage
-
-### **How to Run This Project**
-
-1. **Create Account** - Sign up with your email and password
-2. **Find Users** - Browse online users and start conversations
-3. **Send Messages** - Exchange text, media, and voice messages
-4. **Customize Experience** - Adjust themes and notification preferences
-5. **Stay Connected** - Real-time updates and online status tracking
-
-### **Development Workflow**
+Create a `.env` file in the `backend/` directory by copying the example file:
 ```bash
-# Start backend server
-cd backend && npm run dev
-
-# Start frontend development server
-cd frontend && npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
+cp backend/.env.example backend/.env
 ```
 
-## 🎯 What Makes Echo Special?
+Populate the `.env` file with your credentials:
+```env
+# Server Configuration
+PORT=5002
+NODE_ENV=development
 
-### **Overview**
-Echo is not just another chat application - it's a comprehensive communication platform built with performance, security, and user experience at its core. Every aspect of Echo has been carefully crafted to deliver a premium messaging experience.
+# Database
+MONGODB_URI=mongodb://localhost:27017/aurev-chat
 
-### **Performance First**
-- Optimized for 60fps animations
-- Sub-100ms response times
-- Efficient memory usage
-- Smooth scrolling and transitions
+# Authentication
+JWT_SECRET=generate_a_strong_random_secret_key
 
-### **Modern Development**
-- Latest React 18 features
-- ES6+ syntax throughout
-- Component-based architecture
-- Clean, maintainable code
+# Cloudinary (Required for image/file uploads)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
 
-### **Production Ready**
-- Error handling at every level
-- Secure authentication flows
-- Scalable architecture
-- Deployment optimized
+### Running the Application
+
+You can start both the frontend and backend development servers.
+
+**Terminal 1: Start Backend**
+```bash
+cd backend
+npm run dev
+```
+*The backend will run on `http://localhost:5002` (or the port specified in your .env).*
+
+**Terminal 2: Start Frontend**
+```bash
+cd frontend
+npm run dev
+```
+*The frontend will start a Vite dev server, typically on `http://localhost:5173`.*
+
+---
+
+## 📂 Project Structure
+
+```text
+AUREV/
+├── backend/                  # Node.js REST API & WebSocket Server
+│   ├── src/
+│   │   ├── controllers/      # Business logic & route handlers
+│   │   ├── lib/              # Socket.io configuration & shared utilities
+│   │   ├── middleware/       # Auth guards, rate limiters, etc.
+│   │   ├── models/           # Mongoose schemas (User, Message, etc.)
+│   │   ├── routes/           # Express API route definitions
+│   │   └── index.js          # Server entry point
+│   └── package.json          # Backend dependencies
+│
+├── frontend/                 # React Client Application
+│   ├── src/
+│   │   ├── components/       # Reusable UI components
+│   │   ├── pages/            # View-level components (Login, Chat, etc.)
+│   │   ├── store/            # Zustand global state slices
+│   │   ├── lib/              # Axios instance, Socket client logic
+│   │   ├── utils/            # Helper functions
+│   │   └── main.jsx          # App entry point
+│   └── package.json          # Frontend dependencies
+│
+└── package.json              # Root package config (useful scripts)
+```
+
+---
+
+## 🚀 Performance & Design Decisions (For Recruiters)
+
+When building AUREV, several critical decisions were made to ensure an enterprise-grade application:
+1. **Zustand over Redux**: Chosen for its minimal boilerplate and direct state manipulation capabilities, reducing cognitive load and improving render performance without React Context provider hell.
+2. **Virtualization**: Chat logs can grow indefinitely. `react-virtuoso` ensures that only the visible messages are rendered in the DOM, maintaining a 60FPS scrolling experience regardless of chat length.
+3. **Optimistic UI Updates**: The frontend predicts successful message delivery, instantly displaying the message to the user while silently validating with the backend to mask network latency.
+4. **Security Hardening**: Implementation of `sanitize-html` to block malicious script injections through chat, alongside comprehensive rate-limiting on authentication routes to prevent brute force attacks.
+
+---
 
 ## 🛣️ Roadmap
 
-### **Coming Soon**
-- [ ] **Video Calling** - Face-to-face conversations
-- [ ] **Message Encryption** - End-to-end security
-- [ ] **Push Notifications** - Mobile-style alerts
-- [ ] **Message Search** - Advanced search capabilities
-- [ ] **Group Chats** - Multi-user conversations
-- [ ] **Mobile Apps** - Native iOS/Android applications
+- [ ] **Voice/Video Calls**: WebRTC integration for peer-to-peer real-time media streams.
+- [ ] **Group Channels**: Support for multi-user chat rooms with role-based access control.
+- [ ] **End-to-End Encryption (E2EE)**: Implementing Signal Protocol for absolute privacy.
+- [ ] **Message Search & Indexing**: Adding Redis/ElasticSearch for fast message retrieval.
 
-### **Future Enhancements**
-- [ ] AI-powered message suggestions
-- [ ] Advanced moderation tools
-- [ ] Integration with other platforms
-- [ ] Custom themes and stickers
+---
 
 ## 🤝 Contributing
 
-We welcome contributions! Here's how to get started:
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
+Contributions are always welcome! If you have suggestions to improve this, please fork the repo and create a pull request.
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-### **Development Guidelines**
-- Follow the existing code style
-- Add tests for new features
-- Update documentation as needed
-- Ensure all tests pass before submitting
+---
 
 ## 📄 License
 
-This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Socket.io** - For enabling real-time communication
-- **Cloudinary** - For reliable file storage
-- **TailwindCSS** - For the beautiful UI framework
-- **React Team** - For the amazing frontend library
-
-## 📞 Support
-
-- 📧 Email: support@echo-chat.com
-- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/Echo-chat-app/issues)
-- 💬 Discord: [Join our community](https://discord.gg/echo-chat)
-
-## 👤 Author & Contact
-
-**👨‍💻 Developed by [Your Name]**
-
-Echo represents my passion for creating exceptional user experiences through modern web technologies. This project showcases advanced React development, real-time communication protocols, and performance optimization techniques.
-
-### **Connect With Me**
-- 📧 Email: your.email@example.com
-- 💼 LinkedIn: [Your LinkedIn Profile](https://linkedin.com/in/yourprofile)
-- 🐙 GitHub: [Your GitHub Profile](https://github.com/yourusername)
-- 🐦 Twitter: [@yourusername](https://twitter.com/yourusername)
-
-### **Final Recommendations**
-
-1. **For Developers**: Study the codebase to learn about modern React patterns, Socket.io implementation, and performance optimization techniques.
-
-2. **For Users**: Enjoy a smooth, responsive chat experience with features designed for modern communication needs.
-
-3. **For Businesses**: Consider Echo as a foundation for building custom communication platforms for your teams or customers.
+Distributed under the ISC License. See `LICENSE` for more information.
 
 ---
 
 <div align="center">
-
-**⭐ Star this repo if it helped you!**
-
-Made with ❤️ by the Echo Team
-
+  <b>Built with ❤️ for seamless communication.</b><br>
+  If you found this project helpful or inspiring, please consider giving it a ⭐!
 </div>
