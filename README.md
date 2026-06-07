@@ -4,7 +4,7 @@
   <br />
   <br />
 
-  <h1>🌊 AUREV</h1>
+  <h1>AUREV</h1>
   <p>
     <b>Momentum Communication Platform</b>
   </p>
@@ -217,7 +217,9 @@ Contributions are always welcome! If you have suggestions to improve this, pleas
 
 ## 📄 License
 
-Distributed under the ISC License. See `LICENSE` for more information.
+**All Rights Reserved.**
+
+This software and associated documentation files are proprietary and confidential. You may not use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software without explicit written permission from the owner.
 
 ---
 
