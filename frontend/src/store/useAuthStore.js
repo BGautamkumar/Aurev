@@ -13,6 +13,8 @@ export const useAuthStore = create((set, get) => ({
   isCheckingAuth: true,
   onlineUsers: [],
   socket: null,
+  isSocketConnected: false,
+  socketError: null,
 
   checkAuth: async () => {
     try {
@@ -35,8 +37,11 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: res.data });
       toast.success("Account created successfully");
       get().connectSocket();
+      return res.data;
     } catch (error) {
-      toast.error(error.response.data.message);
+      const errorMessage = error.response?.data?.message || error.message || "Signup failed";
+      toast.error(errorMessage);
+      return null;
     } finally {
       set({ isSigningUp: false });
     }
@@ -51,7 +56,8 @@ export const useAuthStore = create((set, get) => ({
 
       get().connectSocket();
     } catch (error) {
-      toast.error(error.response.data.message);
+      const errorMessage = error.response?.data?.message || error.message || "Login failed";
+      toast.error(errorMessage);
     } finally {
       set({ isLoggingIn: false });
     }
@@ -64,7 +70,8 @@ export const useAuthStore = create((set, get) => ({
       toast.success("Logged out successfully");
       get().disconnectSocket();
     } catch (error) {
-      toast.error(error.response.data.message);
+      const errorMessage = error.response?.data?.message || error.message || "Logout failed";
+      toast.error(errorMessage);
     }
   },
 
@@ -76,7 +83,8 @@ export const useAuthStore = create((set, get) => ({
       toast.success("Profile updated successfully");
     } catch (error) {
       console.log("error in update profile:", error);
-      toast.error(error.response.data.message);
+      const errorMessage = error.response?.data?.message || error.message || "Profile update failed";
+      toast.error(errorMessage);
     } finally {
       set({ isUpdatingProfile: false });
     }
@@ -99,7 +107,8 @@ export const useAuthStore = create((set, get) => ({
       return res.data;
     } catch (error) {
       console.log("error in upload profile picture:", error);
-      toast.error(error.response.data.message);
+      const errorMessage = error.response?.data?.message || error.message || "Profile picture upload failed";
+      toast.error(errorMessage);
       throw error;
     } finally {
       set({ isUpdatingProfile: false });
@@ -110,20 +119,53 @@ export const useAuthStore = create((set, get) => ({
     const { authUser } = get();
     if (!authUser || get().socket?.connected) return;
 
+    // Get JWT token from cookies if readable (fallback)
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('jwt='))
+      ?.split('=')[1];
+
     const socket = io(BASE_URL, {
-      query: {
-        userId: authUser._id,
+      withCredentials: true,
+      auth: {
+        token: token
       },
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 20000,
     });
     socket.connect();
 
     set({ socket: socket });
+
+    socket.on("connect", () => {
+      set({ isSocketConnected: true, socketError: null });
+    });
+
+    socket.on("disconnect", () => {
+      set({ isSocketConnected: false });
+    });
+
+    socket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error.message);
+      set({ isSocketConnected: false, socketError: error.message });
+    });
 
     socket.on("getOnlineUsers", (userIds) => {
       set({ onlineUsers: userIds });
     });
   },
   disconnectSocket: () => {
-    if (get().socket?.connected) get().socket.disconnect();
+    const socket = get().socket;
+    if (socket?.connected) {
+      socket.disconnect();
+      set({ socket: null, isSocketConnected: false });
+    }
+  },
+  clearAuth: () => {
+    set({ authUser: null });
+    get().disconnectSocket();
   },
 }));

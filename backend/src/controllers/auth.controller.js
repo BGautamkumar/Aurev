@@ -87,19 +87,69 @@ export const logout = (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { profilePic } = req.body;
+    const { profilePic, fullName, privacy } = req.body;
     const userId = req.user._id;
 
-    if (!profilePic) {
-      return res.status(400).json({ message: "Profile pic is required" });
+    const updateData = {};
+
+    // Handle profile pic upload
+    if (profilePic) {
+      // Validate data URI format
+      const dataUriRegex = /^data:image\/(png|jpg|jpeg|gif|webp);base64,/;
+      if (!dataUriRegex.test(profilePic)) {
+        return res.status(400).json({ message: "Invalid image format" });
+      }
+
+      // Check file size (base64 string size)
+      const base64Data = profilePic.split(',')[1];
+      const fileSizeBytes = Buffer.byteLength(base64Data, 'base64');
+      const fileSizeMB = fileSizeBytes / (1024 * 1024);
+      
+      if (fileSizeMB > 5) {
+        return res.status(400).json({ message: "File size must be less than 5MB" });
+      }
+
+      const uploadResponse = await cloudinary.uploader.upload(profilePic, {
+        resource_type: 'image',
+        format: 'webp',
+        quality: 'auto:good'
+      });
+      updateData.profilePic = uploadResponse.secure_url;
     }
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
+    // Handle fullName update
+    if (fullName && fullName.trim().length >= 2) {
+      updateData.fullName = fullName.trim();
+    }
+
+    // Handle privacy settings update
+    if (privacy) {
+      const allowedDMs = ["friends", "everyone", "nobody"];
+      const allowedVisibility = ["public", "friends", "private"];
+
+      if (privacy.showOnlineStatus !== undefined) {
+        updateData["privacy.showOnlineStatus"] = Boolean(privacy.showOnlineStatus);
+      }
+      if (privacy.readReceipts !== undefined) {
+        updateData["privacy.readReceipts"] = Boolean(privacy.readReceipts);
+      }
+      if (privacy.allowDMsFrom && allowedDMs.includes(privacy.allowDMsFrom)) {
+        updateData["privacy.allowDMsFrom"] = privacy.allowDMsFrom;
+      }
+      if (privacy.profileVisibility && allowedVisibility.includes(privacy.profileVisibility)) {
+        updateData["privacy.profileVisibility"] = privacy.profileVisibility;
+      }
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: "No valid fields to update" });
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { profilePic: uploadResponse.secure_url },
+      { $set: updateData },
       { new: true }
-    );
+    ).select('-password');
 
     res.status(200).json(updatedUser);
   } catch (error) {
@@ -108,11 +158,26 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-export const checkAuth = (req, res) => {
+export const checkAuth = async (req, res) => {
   try {
-    res.status(200).json(req.user);
+    const user = await User.findById(req.user._id).select('-password');
+    res.status(200).json(user);
   } catch (error) {
     console.log("Error in checkAuth controller", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const getUserProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId).select("fullName email profilePic echoScore echoTier createdAt");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    console.log("Error in getUserProfile controller", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

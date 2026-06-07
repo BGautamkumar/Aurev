@@ -20,9 +20,58 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    // Cached friend IDs for fast lookups (synced by friendship controller)
+    friends: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    // Cached blocked user IDs
+    blockedUsers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    // Privacy settings
+    privacy: {
+      showOnlineStatus: {
+        type: Boolean,
+        default: true,
+      },
+      allowDMsFrom: {
+        type: String,
+        enum: ["friends", "everyone", "nobody"],
+        default: "friends",
+      },
+      profileVisibility: {
+        type: String,
+        enum: ["public", "friends", "private"],
+        default: "public",
+      },
+      readReceipts: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    // Echo Rank parameters
+    echoScore: {
+      type: Number,
+      default: 0,
+    },
+    echoTier: {
+      type: String,
+      enum: ["bronze", "silver", "gold", "diamond", "legend"],
+      default: "bronze",
+    },
   },
   { timestamps: true }
 );
+
+// Indexes for friend lookups and leaderboard sorting
+userSchema.index({ friends: 1 });
+userSchema.index({ echoScore: -1 });
 
 const User = mongoose.model("User", userSchema);
 

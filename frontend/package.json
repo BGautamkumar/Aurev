@@ -1,7 +1,7 @@
 {
-  "name": "echo-frontend",
+  "name": "aurev-frontend",
   "private": true,
-  "description": "Echo - Realtime Chat App Frontend",
+  "description": "AUREV — Momentum Communication Platform",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
@@ -12,13 +12,18 @@
   },
   "dependencies": {
     "axios": "^1.7.7",
+    "clsx": "^2.1.1",
+    "echo-chat-app": "file:..",
+    "framer-motion": "^12.38.0",
     "lucide-react": "^0.459.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.28.0",
+    "react-virtuoso": "^4.18.7",
     "socket.io-client": "^4.8.1",
-    "zustand": "^5.0.1"
+    "tailwind-merge": "^3.5.0",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
@@ -26,12 +31,12 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
     "autoprefixer": "^10.4.20",
-    "daisyui": "^4.12.14",
     "eslint": "^9.13.0",
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
     "globals": "^15.11.0",
+    "knip": "^6.14.2",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",
     "vite": "^5.4.10"
