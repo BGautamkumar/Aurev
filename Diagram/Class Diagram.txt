@@ -17,6 +17,7 @@ class User {
   +joinRoom(room: ChatRoom): void
 }
 
+
 class Message {
   +messageId: String
   +sender: User
