@@ -1,9 +1,4 @@
-<div align="center">
 
-<img src="/frontend/public/screenshot-for-readme.png" alt="AUREV — Momentum Communication Platform" width="100%" />
-
-<br />
-<br />
 
 <sup>
   <strong>⚡ &nbsp; F U L L - S T A C K &nbsp; · &nbsp; R E A L - T I M E &nbsp; · &nbsp; S E C U R I T Y - F I R S T &nbsp; · &nbsp; P R O D U C T I O N - G R A D E</strong>
