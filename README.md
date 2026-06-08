@@ -1,4 +1,4 @@
-
+<div align="center">
 
 <sup>
   <strong>⚡ &nbsp; F U L L - S T A C K &nbsp; · &nbsp; R E A L - T I M E &nbsp; · &nbsp; S E C U R I T Y - F I R S T &nbsp; · &nbsp; P R O D U C T I O N - G R A D E</strong>
