@@ -64,7 +64,7 @@ const CommandPalette = () => {
   const navigationCommands = [
     { id: 'nav-home', label: 'Go to Chat', icon: MessageSquare, action: () => navigate('/') },
     { id: 'nav-rooms', label: 'Go to Frequencies (Rooms)', icon: Compass, action: () => navigate('/rooms') },
-    { id: 'nav-echorank', label: 'Go to Echo Rank', icon: Trophy, action: () => navigate('/echorank') },
+    { id: 'nav-aurevrank', label: 'Go to Aurev Rank', icon: Trophy, action: () => navigate('/aurev-rank') },
     { id: 'nav-settings', label: 'Go to Settings', icon: Settings, action: () => navigate('/settings') },
     { id: 'nav-profile', label: 'Go to Profile', icon: User, action: () => navigate('/profile') },
   ];

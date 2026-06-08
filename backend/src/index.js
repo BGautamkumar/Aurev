@@ -14,7 +14,7 @@ import messageRoutes from "./routes/message.route.js";
 import friendshipRoutes from "./routes/friendship.route.js";
 import conversationRoutes from "./routes/conversation.route.js";
 import roomRoutes from "./routes/room.route.js";
-import echoRoutes from "./routes/echo.route.js";
+import aurevRoutes from "./routes/aurev.route.js";
 import { healthCheck } from "./controllers/health.controller.js";
 import { app, server } from "./lib/socket.js";
 
@@ -48,7 +48,7 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/friends", friendshipRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/rooms", roomRoutes);
-app.use("/api/echo", echoRoutes);
+app.use("/api/aurev", aurevRoutes);
 app.get("/health", healthCheck);
 
 if (process.env.NODE_ENV === "production") {

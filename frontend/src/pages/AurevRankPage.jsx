@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
-import { useEchoStore } from '../store/useEchoStore';
+import { useAurevStore } from '../store/useAurevStore';
 import {
   ArrowLeft, Trophy, TrendingUp, TrendingDown, Minus,
   Users, Globe, Crown, Zap, Shield, Lock
@@ -23,27 +23,27 @@ const TrendIcon = ({ trend }) => {
   return <Minus size={14} className="text-text-muted" />;
 };
 
-const EchoRankPage = () => {
+const AurevRankPage = () => {
   const navigate = useNavigate();
   const { authUser, socket } = useAuthStore();
   const {
-    echoScore,
-    echoTier,
-    echoRank,
+    aurevScore,
+    aurevTier,
+    aurevRank,
     leaderboard,
     isLoadingLeaderboard,
-    getEchoScore,
+    getAurevScore,
     getLeaderboard,
-    subscribeToEchoUpdates,
-    unsubscribeFromEchoUpdates
-  } = useEchoStore();
+    subscribeToAurevUpdates,
+    unsubscribeFromAurevUpdates
+  } = useAurevStore();
 
   const [filter, setFilter] = useState('global');
   const [timeRange] = useState('all');
 
   useEffect(() => {
-    getEchoScore();
-  }, [getEchoScore]);
+    getAurevScore();
+  }, [getAurevScore]);
 
   useEffect(() => {
     getLeaderboard(filter, timeRange);
@@ -51,14 +51,14 @@ const EchoRankPage = () => {
 
   useEffect(() => {
     if (socket) {
-      subscribeToEchoUpdates(socket);
-      return () => unsubscribeFromEchoUpdates(socket);
+      subscribeToAurevUpdates(socket);
+      return () => unsubscribeFromAurevUpdates(socket);
     }
-  }, [socket, subscribeToEchoUpdates, unsubscribeFromEchoUpdates]);
+  }, [socket, subscribeToAurevUpdates, unsubscribeFromAurevUpdates]);
 
-  const myScore = echoScore || 0;
-  const myTier = echoTier || 'bronze';
-  const myRank = echoRank || '-';
+  const myScore = aurevScore || 0;
+  const myTier = aurevTier || 'bronze';
+  const myRank = aurevRank || '-';
   const myTierConfig = tierConfig[myTier] || tierConfig.bronze;
 
   // Next tier threshold calculation
@@ -87,8 +87,8 @@ const EchoRankPage = () => {
   // Dynamic Milestones based on caller's real parameters
   const journeyMilestones = [
     { id: 'm1', label: 'First Spike Spoken', desc: 'Secure connection established, broadcasted first message', date: myScore > 0 ? 'Active' : 'Locked', unlocked: myScore > 0 },
-    { id: 'm2', label: 'Reached Silver Status', desc: 'Crossed 100 Echo Score parameters', date: myScore >= 100 ? 'Active' : 'Locked', unlocked: myScore >= 100 },
-    { id: 'm3', label: 'Reached Gold Status', desc: 'Crossed 500 Echo Score parameters', date: myScore >= 500 ? 'Active' : 'Locked', unlocked: myScore >= 500 },
+    { id: 'm2', label: 'Reached Silver Status', desc: 'Crossed 100 Aurev Score parameters', date: myScore >= 100 ? 'Active' : 'Locked', unlocked: myScore >= 100 },
+    { id: 'm3', label: 'Reached Gold Status', desc: 'Crossed 500 Aurev Score parameters', date: myScore >= 500 ? 'Active' : 'Locked', unlocked: myScore >= 500 },
   ];
 
   // Podium splits
@@ -113,7 +113,7 @@ const EchoRankPage = () => {
             <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-cyan/3" />
             <div className="relative flex flex-col sm:flex-row items-center gap-6">
               <div className="relative">
-                <Avatar src={authUser?.profilePic} name={authUser?.fullName} size="xl" echoTier={myTier} showOnlineIndicator={false} />
+                <Avatar src={authUser?.profilePic} name={authUser?.fullName} size="xl" aurevTier={myTier} showOnlineIndicator={false} />
                 <div className={`absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-gradient-to-br ${myTierConfig.gradient} flex items-center justify-center border-2 border-surface-50`}>
                   <myTierConfig.icon size={14} className="text-white" />
                 </div>
@@ -126,7 +126,7 @@ const EchoRankPage = () => {
                 <div className="flex items-center justify-center sm:justify-start gap-5">
                   <div>
                     <span className="text-3xl font-black ads-text-gradient">{myScore}</span>
-                    <span className="text-text-muted text-[11px] font-mono ml-2 uppercase">Echo Score</span>
+                    <span className="text-text-muted text-[11px] font-mono ml-2 uppercase">Aurev Score</span>
                   </div>
                   <div className="w-px h-8 bg-border" />
                   <div>
@@ -207,7 +207,7 @@ const EchoRankPage = () => {
                   No rankings generated yet
                 </h3>
                 <p className="text-xs text-text-secondary leading-relaxed">
-                  Active contributions and transmissions generate gravity ranks. Speak first on text channels and build your Echo Score parameters.
+                  Active contributions and transmissions generate gravity ranks. Speak first on text channels and build your Aurev Score parameters.
                 </p>
               </div>
             </div>
@@ -222,7 +222,7 @@ const EchoRankPage = () => {
                 <div className="flex flex-col items-center">
                   <div className="relative group cursor-pointer mb-2.5">
                     <div className="ring-2 ring-gray-400 rounded-full p-0.5 shadow-glow-cyan/5">
-                      <Avatar src={top2.profilePic} name={top2.fullName} size="lg" echoTier={top2.tier} showOnlineIndicator={false} />
+                      <Avatar src={top2.profilePic} name={top2.fullName} size="lg" aurevTier={top2.tier} showOnlineIndicator={false} />
                     </div>
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-gray-400 flex items-center justify-center border border-surface text-[10px] font-bold text-surface">
                       2
@@ -230,7 +230,7 @@ const EchoRankPage = () => {
                   </div>
                   <div className="w-full bg-surface-100/60 rounded-t-ads-lg border-t border-l border-r border-default p-4 text-center space-y-1 h-32 flex flex-col justify-center">
                     <p className="text-xs font-bold text-text truncate">@{top2.username}</p>
-                    <p className="text-[10px] font-mono text-gray-400">{top2.echoScore.toLocaleString()} AU</p>
+                    <p className="text-[10px] font-mono text-gray-400">{top2.aurevScore.toLocaleString()} AU</p>
                     <p className="text-[8px] font-bold text-text-muted uppercase">Silver Tier</p>
                   </div>
                 </div>
@@ -242,7 +242,7 @@ const EchoRankPage = () => {
                   <div className="relative group cursor-pointer mb-2">
                     <Crown className="w-6 h-6 text-accent animate-float absolute -top-5 left-1/2 -translate-x-1/2 drop-shadow-[0_0_8px_rgba(245,197,24,0.4)]" />
                     <div className="ring-3 ring-accent rounded-full p-0.5 shadow-glow-accent/15">
-                      <Avatar src={top1.profilePic} name={top1.fullName} size="xl" echoTier={top1.tier} showOnlineIndicator={false} />
+                      <Avatar src={top1.profilePic} name={top1.fullName} size="xl" aurevTier={top1.tier} showOnlineIndicator={false} />
                     </div>
                     <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-accent flex items-center justify-center border border-surface text-xs font-black text-surface">
                       1
@@ -251,7 +251,7 @@ const EchoRankPage = () => {
                   
                   <div className="w-full bg-surface-100/80 rounded-t-ads-lg border-t border-l border-r border-accent/30 p-4 text-center space-y-1.5 h-38 shadow-glow-accent/5 flex flex-col justify-center">
                     <p className="text-xs font-bold text-accent truncate">@{top1.username}</p>
-                    <p className="text-sm font-black text-text font-mono">{top1.echoScore.toLocaleString()} AU</p>
+                    <p className="text-sm font-black text-text font-mono">{top1.aurevScore.toLocaleString()} AU</p>
                     <p className="text-[8px] font-bold text-accent uppercase tracking-widest">Legend Tier</p>
                   </div>
                 </div>
@@ -262,7 +262,7 @@ const EchoRankPage = () => {
                 <div className="flex flex-col items-center">
                   <div className="relative group cursor-pointer mb-2.5">
                     <div className="ring-2 ring-orange-800 rounded-full p-0.5">
-                      <Avatar src={top3.profilePic} name={top3.fullName} size="lg" echoTier={top3.tier} showOnlineIndicator={false} />
+                      <Avatar src={top3.profilePic} name={top3.fullName} size="lg" aurevTier={top3.tier} showOnlineIndicator={false} />
                     </div>
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-orange-800 flex items-center justify-center border border-surface text-[10px] font-bold text-surface">
                       3
@@ -270,7 +270,7 @@ const EchoRankPage = () => {
                   </div>
                   <div className="w-full bg-surface-100/60 rounded-t-ads-lg border-t border-l border-r border-default p-4 text-center space-y-1 h-28 flex flex-col justify-center">
                     <p className="text-xs font-bold text-text truncate">@{top3.username}</p>
-                    <p className="text-[10px] font-mono text-orange-800">{top3.echoScore.toLocaleString()} AU</p>
+                    <p className="text-[10px] font-mono text-orange-800">{top3.aurevScore.toLocaleString()} AU</p>
                     <p className="text-[8px] font-bold text-text-muted uppercase">Bronze Tier</p>
                   </div>
                 </div>
@@ -292,7 +292,7 @@ const EchoRankPage = () => {
                           #{user.rank}
                         </div>
 
-                        <Avatar src={user.profilePic} name={user.fullName} size="sm" echoTier={user.tier} showOnlineIndicator={false} />
+                        <Avatar src={user.profilePic} name={user.fullName} size="sm" aurevTier={user.tier} showOnlineIndicator={false} />
                         <div className="flex-1 min-w-0">
                           <div className="font-semibold text-xs text-text truncate">
                             {user.fullName}
@@ -301,7 +301,7 @@ const EchoRankPage = () => {
                         </div>
 
                         <div className="text-right">
-                          <div className="font-bold text-xs text-text font-mono">{user.echoScore.toLocaleString()}</div>
+                          <div className="font-bold text-xs text-text font-mono">{user.aurevScore.toLocaleString()}</div>
                           <div className="flex items-center justify-end gap-1 mt-0.5">
                             <TrendIcon trend={user.trend} />
                           </div>
@@ -350,4 +350,4 @@ const EchoRankPage = () => {
   );
 };
 
-export default EchoRankPage;
+export default AurevRankPage;

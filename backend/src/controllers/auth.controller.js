@@ -171,7 +171,7 @@ export const checkAuth = async (req, res) => {
 export const getUserProfile = async (req, res) => {
   try {
     const { userId } = req.params;
-    const user = await User.findById(userId).select("fullName email profilePic echoScore echoTier createdAt");
+    const user = await User.findById(userId).select("fullName email profilePic aurevScore aurevTier createdAt");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

@@ -42,7 +42,7 @@ const Avatar = ({
   size = 'md',
   online,
   showOnlineIndicator = true,
-  echoTier,
+  aurevTier,
   className,
   ...props
 }) => {
@@ -62,8 +62,8 @@ const Avatar = ({
         className={cn(
           sizeMap[size],
           'rounded-full overflow-hidden',
-          echoTier
-            ? `ring-2 ${tierRingColors[echoTier] || 'ring-border'}`
+          aurevTier
+            ? `ring-2 ${tierRingColors[aurevTier] || 'ring-border'}`
             : online
               ? 'ring-2 ring-emerald/40'
               : 'ring-1 ring-border'

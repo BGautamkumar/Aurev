@@ -21,7 +21,7 @@ const LoginPage = () => {
   };
 
   const features = [
-    { icon: <Crown className="w-5 h-5 text-accent" />, title: 'Echo Rank', description: 'Your live reputation — built by every message, reaction, and contribution' },
+    { icon: <Crown className="w-5 h-5 text-accent" />, title: 'Aurev Rank', description: 'Your live reputation — built by every message, reaction, and contribution' },
     { icon: <Radio className="w-5 h-5 text-cyan" />, title: 'Stream Rooms', description: 'Living communities with a pulse — not dead group chats' },
     { icon: <Key className="w-5 h-5 text-emerald" />, title: 'Sovereign Identity', description: 'Cryptographic identity — you own your account, forever' },
   ];

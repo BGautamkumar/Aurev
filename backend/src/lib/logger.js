@@ -7,7 +7,7 @@ const logger = winston.createLogger({
     winston.format.errors({ stack: true }),
     winston.format.json()
   ),
-  defaultMeta: { service: 'echo-chat-api' },
+  defaultMeta: { service: 'aurev-chat-api' },
   transports: [
     new winston.transports.File({ 
       filename: 'logs/error.log', 

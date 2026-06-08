@@ -101,7 +101,7 @@ const StreamRoomsPage = () => {
               Find your <span className="ads-text-gradient">frequency</span>
             </h1>
             <p className="text-text-secondary text-sm leading-relaxed">
-              Orbit communities where gravity is earned in real time. Contribute, build momentum, and secure Echo Score.
+              Orbit communities where gravity is earned in real time. Contribute, build momentum, and secure Aurev Score.
             </p>
           </div>
 
@@ -323,7 +323,7 @@ const StreamRoomsPage = () => {
 
                             <div className="flex items-center gap-2">
                               <span className="text-[10px] font-mono font-semibold text-accent bg-accent/10 px-1.5 py-0.5 rounded border border-accent/20">
-                                {(room.echoScore || 0).toLocaleString()} AU
+                                {(room.aurevScore || 0).toLocaleString()} AU
                               </span>
                             </div>
                           </div>

@@ -162,7 +162,7 @@ const SignUpPage = () => {
                   Communication that builds you.
                 </h2>
                 <p className="text-text-secondary text-md leading-relaxed max-w-md">
-                  Every message you send, every reaction you give, every community you build — it all becomes part of your Echo.
+                  Every message you send, every reaction you give, every community you build — it all becomes part of your Aurev.
                 </p>
               </div>
             </div>

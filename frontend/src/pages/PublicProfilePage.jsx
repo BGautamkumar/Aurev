@@ -66,15 +66,15 @@ const PublicProfilePage = () => {
     }
   };
 
-  const tier = profileUser.echoTier || 'bronze';
+  const tier = profileUser.aurevTier || 'bronze';
   const tierDetails = getTierDetails(tier);
   const joinDate = new Date(profileUser.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   // Dynamic achievements based on user's real points
   const achievementsList = [
-    { id: 'first_spike', label: 'First Spike', desc: 'Sent first frequency message', unlocked: profileUser.echoScore > 0, icon: Sparkles, color: 'text-accent bg-accent/10' },
-    { id: 'gravity_anchor', label: 'Gravity Anchor', desc: 'Accumulated 1,000+ Echo Score', unlocked: profileUser.echoScore >= 1000, icon: Crown, color: 'text-cyan bg-cyan/10' },
-    { id: 'silver_badge', label: 'Silver Node', desc: 'Reached Silver tier status parameters', unlocked: profileUser.echoScore >= 100, icon: Shield, color: 'text-indigo-400 bg-indigo-400/10' },
+    { id: 'first_spike', label: 'First Spike', desc: 'Sent first frequency message', unlocked: profileUser.aurevScore > 0, icon: Sparkles, color: 'text-accent bg-accent/10' },
+    { id: 'gravity_anchor', label: 'Gravity Anchor', desc: 'Accumulated 1,000+ Aurev Score', unlocked: profileUser.aurevScore >= 1000, icon: Crown, color: 'text-cyan bg-cyan/10' },
+    { id: 'silver_badge', label: 'Silver Node', desc: 'Reached Silver tier status parameters', unlocked: profileUser.aurevScore >= 100, icon: Shield, color: 'text-indigo-400 bg-indigo-400/10' },
   ];
 
   return (
@@ -165,9 +165,9 @@ const PublicProfilePage = () => {
           </div>
           <div className="ads-surface p-4 text-center space-y-1 bg-accent/5 border border-accent/20">
             <span className="text-[10px] font-bold text-accent uppercase tracking-widest flex items-center justify-center gap-1">
-              <Trophy size={11} className="text-accent" /> Echo Score
+              <Trophy size={11} className="text-accent" /> Aurev Score
             </span>
-            <p className="text-lg font-black font-mono text-accent">{(profileUser.echoScore || 0).toLocaleString()} AU</p>
+            <p className="text-lg font-black font-mono text-accent">{(profileUser.aurevScore || 0).toLocaleString()} AU</p>
           </div>
         </div>
 
@@ -207,7 +207,7 @@ const PublicProfilePage = () => {
             </div>
           </div>
 
-          {/* Recent Echoes Activity Feed */}
+          {/* Recent Aurevs Activity Feed */}
           <div className="ads-surface p-5 space-y-4">
             <h3 className="text-xs font-bold text-text-secondary uppercase tracking-widest flex items-center gap-1.5 border-b border-default pb-3">
               <Activity size={12} className="text-cyan" /> Recent Activity

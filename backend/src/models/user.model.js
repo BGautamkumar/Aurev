@@ -55,12 +55,12 @@ const userSchema = new mongoose.Schema(
         default: true,
       },
     },
-    // Echo Rank parameters
-    echoScore: {
+    // Aurev Rank parameters
+    aurevScore: {
       type: Number,
       default: 0,
     },
-    echoTier: {
+    aurevTier: {
       type: String,
       enum: ["bronze", "silver", "gold", "diamond", "legend"],
       default: "bronze",
@@ -71,7 +71,7 @@ const userSchema = new mongoose.Schema(
 
 // Indexes for friend lookups and leaderboard sorting
 userSchema.index({ friends: 1 });
-userSchema.index({ echoScore: -1 });
+userSchema.index({ aurevScore: -1 });
 
 const User = mongoose.model("User", userSchema);
 

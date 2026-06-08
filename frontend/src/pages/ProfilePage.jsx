@@ -14,7 +14,7 @@ import Badge from '../components/atoms/Badge';
 
 const achievementsList = [
   { id: 'first_spike', label: 'First Spike', desc: 'Sent first frequency message', unlocked: true, icon: Sparkles, color: 'text-accent bg-accent/10' },
-  { id: 'gravity_anchor', label: 'Gravity Anchor', desc: 'Accumulated 10,000+ Echo Score', unlocked: true, icon: Crown, color: 'text-cyan bg-cyan/10' },
+  { id: 'gravity_anchor', label: 'Gravity Anchor', desc: 'Accumulated 10,000+ Aurev Score', unlocked: true, icon: Crown, color: 'text-cyan bg-cyan/10' },
   { id: 'night_owl', label: 'Night Owl', desc: 'Active after midnight in Orbit', unlocked: true, icon: Shield, color: 'text-indigo-400 bg-indigo-400/10' },
   { id: 'room_creator', label: 'Station Master', desc: 'Established first custom room', unlocked: false, icon: Radio, color: 'text-rose bg-rose/10' },
 ];
@@ -88,9 +88,9 @@ const ProfilePage = () => {
 
   const activeBanner = bannerGradients.find(b => b.id === selectedBanner) || bannerGradients[0];
 
-  const recentEchoes = [
+  const recentAurevs = [
     { text: "Spoke in #general inside Vercel Orbit", date: "Just now" },
-    { text: "Reached Level 2 Echo Rank parameter", date: "2 days ago" },
+    { text: "Reached Level 2 Aurev Rank parameter", date: "2 days ago" },
     { text: "Activated Sovereign ID keys", date: "3 days ago" },
   ];
 
@@ -179,7 +179,7 @@ const ProfilePage = () => {
             {[
               { icon: Users, label: 'Friends', value: friends?.length || 0 },
               { icon: MessageSquare, label: 'Conversations', value: '14' },
-              { icon: Trophy, label: 'Echo Score', value: '4,280' },
+              { icon: Trophy, label: 'Aurev Score', value: '4,280' },
             ].map((stat, i) => (
               <div key={i} className="px-4 py-4 text-center">
                 <stat.icon className="w-4.5 h-4.5 text-accent/40 mx-auto mb-1.5" />
@@ -249,14 +249,14 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {/* Recent Echoes Timeline Feed */}
+          {/* Recent Aurevs Timeline Feed */}
           <div className="ads-surface p-5 space-y-4">
             <h3 className="text-xs font-bold text-text-secondary uppercase tracking-widest flex items-center gap-1.5 border-b border-default pb-3">
               <Activity size={12} className="text-cyan" /> Milestones Timeline
             </h3>
             
             <div className="relative border-l border-default pl-4 space-y-5 py-1.5 ml-2">
-              {recentEchoes.map((log, index) => (
+              {recentAurevs.map((log, index) => (
                 <div key={index} className="relative space-y-1">
                   <div className="absolute -left-[20.5px] top-1.5 w-2 h-2 rounded-full bg-accent ring-4 ring-accent/10 shadow-glow-accent/10" />
                   <p className="text-xs text-text-secondary leading-relaxed">{log.text}</p>

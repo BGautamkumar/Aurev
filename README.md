@@ -13,7 +13,7 @@
 </h1>
 
 <h3>
-  <em>Communication engineered to move at the speed of thought.</em>
+  <em>Communication engineered to move at the speed of thoughts.</em>
 </h3>
 
 <br />

@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "Echo - Realtime Chat App Backend",
+  "description": "Aurev - Realtime Chat App Backend",
   "main": "src/index.js",
   "scripts": {
     "dev": "nodemon src/index.js",
@@ -17,7 +17,7 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "echo-chat-app": "file:..",
+    "aurev": "file:..",
     "express": "^4.21.1",
     "express-rate-limit": "^8.3.2",
     "joi": "^18.1.2",

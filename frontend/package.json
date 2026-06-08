@@ -13,7 +13,7 @@
   "dependencies": {
     "axios": "^1.7.7",
     "clsx": "^2.1.1",
-    "echo-chat-app": "file:..",
+    "aurev": "file:..",
     "framer-motion": "^12.38.0",
     "lucide-react": "^0.459.0",
     "react": "^18.3.1",

@@ -15,7 +15,7 @@ const NavRail = () => {
   const navItems = [
     { to: '/messages', icon: MessageSquare, label: 'Messages' },
     { to: '/rooms', icon: Radio, label: 'Stream Rooms' },
-    { to: '/echo-rank', icon: Trophy, label: 'Echo Rank' },
+    { to: '/aurev-rank', icon: Trophy, label: 'Aurev Rank' },
   ];
 
   const isActive = (path) => {

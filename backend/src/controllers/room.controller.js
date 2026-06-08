@@ -6,7 +6,7 @@ export const getRooms = async (req, res) => {
   try {
     const rooms = await Room.find({})
       .populate("creator", "fullName profilePic")
-      .populate("members", "fullName profilePic echoTier")
+      .populate("members", "fullName profilePic aurevTier")
       .sort({ createdAt: -1 });
     res.status(200).json(rooms);
   } catch (error) {
@@ -43,7 +43,7 @@ export const createRoom = async (req, res) => {
       trendingTopic: trendingTopic || "Fresh starts",
       heatmap: Array(24).fill(0).map(() => Math.floor(Math.random() * 5)),
       health: "warm",
-      echoScore: 100,
+      aurevScore: 100,
     });
 
     await newRoom.save();
@@ -62,7 +62,7 @@ export const getRoomMessages = async (req, res) => {
     const limit = parseInt(req.query.limit) || 100;
 
     const messages = await RoomMessage.find({ roomId, channelId })
-      .populate("senderId", "fullName profilePic echoTier")
+      .populate("senderId", "fullName profilePic aurevTier")
       .sort({ createdAt: -1 })
       .limit(limit);
 

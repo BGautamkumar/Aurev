@@ -153,7 +153,7 @@ export const useStreamStore = create((set, get) => ({
         _id: authUser._id,
         fullName: authUser.fullName,
         profilePic: authUser.profilePic,
-        echoTier: authUser.echoTier || "bronze"
+        aurevTier: authUser.aurevTier || "bronze"
       },
       createdAt: new Date().toISOString(),
       status: "pending"

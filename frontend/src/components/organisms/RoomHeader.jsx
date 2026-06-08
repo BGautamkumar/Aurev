@@ -35,10 +35,10 @@ const RoomHeader = () => {
           <span>{activeRoom.activeCount} active</span>
         </div>
 
-        {/* Room Echo Score Badge */}
+        {/* Room Aurev Score Badge */}
         <div className="flex items-center gap-1.5 px-2.5 py-1 bg-accent/10 rounded-ads-sm border border-accent/25 text-xxs font-mono text-accent shadow-glow-accent/5">
           <Radio size={11} className="animate-pulse" />
-          <span>{activeRoom.echoScore.toLocaleString()} AU</span>
+          <span>{activeRoom.aurevScore.toLocaleString()} AU</span>
         </div>
       </div>
     </header>

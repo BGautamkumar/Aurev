@@ -27,7 +27,7 @@ const RoomMemberList = () => {
       id: m._id,
       fullName: isMe ? `${m.fullName} (You)` : m.fullName,
       username: m.email ? m.email.split("@")[0] : (m.username || "orbiter"),
-      tier: m.echoTier || m.tier || "bronze",
+      tier: m.aurevTier || m.tier || "bronze",
       status: isMe ? "online" : "offline", // Socket integrations could update this, default to offline for others for now
     };
   });

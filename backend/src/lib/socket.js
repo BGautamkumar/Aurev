@@ -188,7 +188,7 @@ io.on("connection", async (socket) => {
       // Add user as a member of the room if they aren't already
       if (!room.members.some(mid => mid.toString() === userId)) {
         room.members.push(userId);
-        room.echoScore = (room.echoScore || 0) + 50;
+        room.aurevScore = (room.aurevScore || 0) + 50;
         await room.save();
       }
 
@@ -202,21 +202,21 @@ io.on("connection", async (socket) => {
       });
 
       const savedMessage = await roomMessage.save();
-      await savedMessage.populate("senderId", "fullName profilePic echoTier");
+      await savedMessage.populate("senderId", "fullName profilePic aurevTier");
 
-      // Award 15 Echo Score points to sender on room message send
+      // Award 15 Aurev Score points to sender on room message send
       const UserModel = (await import("../models/user.model.js")).default;
       const sender = await UserModel.findById(userId);
       if (sender) {
-        sender.echoScore = (sender.echoScore || 0) + 15;
-        const { calculateTier } = await import("../controllers/echo.controller.js");
-        sender.echoTier = calculateTier(sender.echoScore);
+        sender.aurevScore = (sender.aurevScore || 0) + 15;
+        const { calculateTier } = await import("../controllers/aurev.controller.js");
+        sender.aurevTier = calculateTier(sender.aurevScore);
         await sender.save();
 
-        socket.emit("echo:scoreUpdate", {
-          score: sender.echoScore,
-          tier: sender.echoTier,
-          rank: await UserModel.countDocuments({ echoScore: { $gt: sender.echoScore } }) + 1
+        socket.emit("aurev:scoreUpdate", {
+          score: sender.aurevScore,
+          tier: sender.aurevTier,
+          rank: await UserModel.countDocuments({ aurevScore: { $gt: sender.aurevScore } }) + 1
         });
       }
 
@@ -359,17 +359,17 @@ io.on("connection", async (socket) => {
 
       const savedMessage = await message.save();
       
-      // Award 10 Echo Score points to sender on direct message send
+      // Award 10 Aurev Score points to sender on direct message send
       if (sender) {
-        sender.echoScore = (sender.echoScore || 0) + 10;
-        const { calculateTier } = await import("../controllers/echo.controller.js");
-        sender.echoTier = calculateTier(sender.echoScore);
+        sender.aurevScore = (sender.aurevScore || 0) + 10;
+        const { calculateTier } = await import("../controllers/aurev.controller.js");
+        sender.aurevTier = calculateTier(sender.aurevScore);
         await sender.save();
 
-        socket.emit("echo:scoreUpdate", {
-          score: sender.echoScore,
-          tier: sender.echoTier,
-          rank: await UserModel.countDocuments({ echoScore: { $gt: sender.echoScore } }) + 1
+        socket.emit("aurev:scoreUpdate", {
+          score: sender.aurevScore,
+          tier: sender.aurevTier,
+          rank: await UserModel.countDocuments({ aurevScore: { $gt: sender.aurevScore } }) + 1
         });
       }
       

@@ -10,25 +10,25 @@ export const calculateTier = (score) => {
   return "bronze";
 };
 
-export const getEchoScore = async (req, res) => {
+export const getAurevScore = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const score = user.echoScore || 0;
+    const score = user.aurevScore || 0;
     
     // Find the rank position dynamically: count of users with higher score + 1
-    const rank = await User.countDocuments({ echoScore: { $gt: score } }) + 1;
+    const rank = await User.countDocuments({ aurevScore: { $gt: score } }) + 1;
 
     res.status(200).json({
       score,
-      tier: user.echoTier || "bronze",
+      tier: user.aurevTier || "bronze",
       rank
     });
   } catch (error) {
-    logger.error("Error in getEchoScore:", error);
+    logger.error("Error in getAurevScore:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -45,11 +45,11 @@ export const getLeaderboard = async (req, res) => {
     }
 
     // Only include users with non-zero scores to reflect real activity
-    query.echoScore = { $gt: 0 };
+    query.aurevScore = { $gt: 0 };
 
     const leaderboard = await User.find(query)
-      .select("fullName profilePic echoScore echoTier email")
-      .sort({ echoScore: -1 })
+      .select("fullName profilePic aurevScore aurevTier email")
+      .sort({ aurevScore: -1 })
       .limit(50);
 
     const rankedLeaderboard = leaderboard.map((user, index) => {
@@ -59,8 +59,8 @@ export const getLeaderboard = async (req, res) => {
         fullName: user.fullName,
         username: emailUsername,
         profilePic: user.profilePic,
-        echoScore: user.echoScore,
-        tier: user.echoTier,
+        aurevScore: user.aurevScore,
+        tier: user.aurevTier,
         rank: index + 1,
         trend: "stable",
       };

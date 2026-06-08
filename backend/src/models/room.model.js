@@ -49,7 +49,7 @@ const roomSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    echoScore: {
+    aurevScore: {
       type: Number,
       default: 0,
     },

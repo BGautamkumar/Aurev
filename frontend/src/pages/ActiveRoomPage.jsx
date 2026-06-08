@@ -117,7 +117,7 @@ const ActiveRoomPage = () => {
               {currentMessages.map((msg, index) => {
                 const sender = msg.senderId || msg.sender;
                 const senderName = sender?.fullName || "Astral Orbiter";
-                const senderTier = sender?.echoTier || sender?.tier || "bronze";
+                const senderTier = sender?.aurevTier || sender?.tier || "bronze";
                 const isOwn = sender?._id === authUser?._id || sender?.id === 'me';
                 const showHeader = index === 0 || (currentMessages[index - 1].senderId?._id || currentMessages[index - 1].sender?.id) !== (sender?._id || sender?.id);
 

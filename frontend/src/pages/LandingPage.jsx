@@ -312,7 +312,7 @@ const LandingPage = () => {
   const features = [
     {
       icon: Trophy,
-      title: 'Echo Rank',
+      title: 'Aurev Rank',
       desc: 'Your reputation, earned in real time. Every message and reaction builds a portable score that persists across conversations and rooms.',
       accent: '#F59E0B',
     },
@@ -476,7 +476,7 @@ const LandingPage = () => {
 
           {/* Nav links — desktop */}
           <nav className="hidden md:flex items-center gap-7">
-            {['Features', 'Rooms', 'Echo Rank'].map(link => (
+            {['Features', 'Rooms', 'Aurev Rank'].map(link => (
               <button
                 key={link}
                 onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
@@ -618,7 +618,7 @@ const LandingPage = () => {
             {
               step: '02',
               title: 'Start messaging',
-              desc: 'Find friends, join rooms, and send messages. Every interaction earns Echo Points that build your live reputation score.',
+              desc: 'Find friends, join rooms, and send messages. Every interaction earns Aurev Points that build your live reputation score.',
               accent: '#6366F1',
             },
             {
@@ -672,7 +672,7 @@ const LandingPage = () => {
                 className="font-black tracking-tight leading-tight text-white"
                 style={{ fontSize: 'clamp(26px, 3.5vw, 40px)' }}
               >
-                Your echo starts here
+                Your aurev starts here
               </h2>
               <p className="mt-3 text-slate-400 text-sm leading-relaxed max-w-sm">
                 Join thousands of users already building their momentum. Free forever — no card required.

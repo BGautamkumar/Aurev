@@ -8,7 +8,7 @@ import { Suspense, lazy, useEffect } from "react";
 
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
-const EchoRankPage = lazy(() => import("./pages/EchoRankPage"));
+const AurevRankPage = lazy(() => import("./pages/AurevRankPage"));
 const StreamRoomsPage = lazy(() => import("./pages/StreamRoomsPage"));
 const ActiveRoomPage = lazy(() => import("./pages/ActiveRoomPage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
@@ -112,7 +112,7 @@ const App = () => {
           <Route path="/profile" element={<Navigate to="/me" />} />
           <Route path="/me" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><ProfilePage /></Suspense></ProtectedRoute>} />
           <Route path="/profile/:id" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><PublicProfilePage /></Suspense></ProtectedRoute>} />
-          <Route path="/echo-rank" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><EchoRankPage /></Suspense></ProtectedRoute>} />
+          <Route path="/aurev-rank" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><AurevRankPage /></Suspense></ProtectedRoute>} />
           <Route path="/rooms" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><StreamRoomsPage /></Suspense></ProtectedRoute>} />
           <Route path="/rooms/:id" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><ActiveRoomPage /></Suspense></ProtectedRoute>} />
         </Routes>
