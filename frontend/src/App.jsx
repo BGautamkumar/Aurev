@@ -1,6 +1,8 @@
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ErrorBoundary from "./components/organisms/ErrorBoundary";
 import Spinner from "./components/atoms/Spinner";
 import { WifiOff } from 'lucide-react';
@@ -105,6 +107,8 @@ const App = () => {
           <Route path="/messages/:id" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
           <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
           <Route path="/signup" element={<GuestRoute><SignUpPage /></GuestRoute>} />
+          <Route path="/forgot-password" element={<GuestRoute><ForgotPasswordPage /></GuestRoute>} />
+          <Route path="/reset-password/:token" element={<GuestRoute><ResetPasswordPage /></GuestRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SettingsPage /></Suspense></ProtectedRoute>} />
           <Route path="/settings/privacy" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SettingsPage /></Suspense></ProtectedRoute>} />
           <Route path="/settings/notifications" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SettingsPage /></Suspense></ProtectedRoute>} />

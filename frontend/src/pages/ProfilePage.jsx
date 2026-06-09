@@ -95,7 +95,7 @@ const ProfilePage = () => {
   ];
 
   return (
-    <div className="min-h-screen pt-8 pb-12 px-6 bg-surface overflow-y-auto">
+    <div className="h-full pt-8 pb-12 px-6 bg-surface overflow-y-auto">
       <div className="max-w-2xl mx-auto space-y-6">
         
         {/* Back */}

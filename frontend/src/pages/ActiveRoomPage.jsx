@@ -86,7 +86,7 @@ const ActiveRoomPage = () => {
   };
 
   return (
-    <div className="h-screen overflow-hidden bg-surface flex animate-fade-in">
+    <div className="h-full overflow-hidden bg-surface flex animate-fade-in">
       {/* Col 1 — Channels & Heatmap */}
       <StreamRoomSidebar />
 

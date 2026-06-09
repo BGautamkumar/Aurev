@@ -86,7 +86,7 @@ const StreamRoomsPage = () => {
   const featuredRooms = rooms.filter(r => r.health === 'hot').slice(0, 2);
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col">
+    <div className="h-full bg-surface flex flex-col overflow-y-auto">
       <CreateRoomModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
       {/* Hero Banner Section */}

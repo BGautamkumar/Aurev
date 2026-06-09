@@ -117,7 +117,7 @@ const SignUpPage = () => {
     };
 
     const user = await signup(signupPayload);
-    
+
     if (user) {
       if (avatarFile) {
         try {
@@ -141,7 +141,7 @@ const SignUpPage = () => {
     <div className="min-h-screen bg-surface flex items-center justify-center p-4 ads-ambient">
       <div className="relative w-full max-w-6xl mx-auto z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          
+
           {/* Left Panel — Brand Benefits */}
           <div className="hidden lg:block text-left space-y-10 animate-fade-in-up">
             <div className="space-y-6">
@@ -184,8 +184,8 @@ const SignUpPage = () => {
 
           {/* Right Panel — Signup Form */}
           <div className="animate-scale-in">
-            <AuthCard 
-              title="Create Account" 
+            <AuthCard
+              title="Create Account"
               subtitle={
                 <div className="flex items-center gap-1.5 mt-1 select-none">
                   <div className={`w-2 h-2 rounded-full ${step >= 1 ? 'bg-accent shadow-glow-accent/20' : 'bg-surface-300'}`} />
@@ -232,16 +232,16 @@ const SignUpPage = () => {
                     label={
                       <span className="text-text-secondary text-sm">
                         I agree to the{' '}
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           onClick={() => toast.success('Terms of Service: Decentralized reputation protocols fully engaged.', { icon: '📄' })}
                           className="text-accent hover:text-accent transition-colors cursor-pointer"
                         >
                           Terms of Service
                         </button>
                         {' '}and{' '}
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           onClick={() => toast.success('Privacy Policy: All communications are end-to-end socket signed.', { icon: '🔒' })}
                           className="text-accent hover:text-accent transition-colors cursor-pointer"
                         >
@@ -251,11 +251,11 @@ const SignUpPage = () => {
                     }
                   />
 
-                  <Button 
-                    type="button" 
-                    variant="accent" 
-                    size="lg" 
-                    fullWidth 
+                  <Button
+                    type="button"
+                    variant="accent"
+                    size="lg"
+                    fullWidth
                     onClick={goToStep2}
                     iconRight={<ArrowRight className="w-4 h-4" />}
                   >
@@ -292,15 +292,15 @@ const SignUpPage = () => {
 
                   <div className="space-y-1.5">
                     <Input
-                      type="text" 
-                      label="Choose Username" 
+                      type="text"
+                      label="Choose Username"
                       placeholder="e.g. gautam"
                       value={username}
                       onChange={(e) => setUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g, ''))}
                       required
                       maxLength={15}
                     />
-                    
+
                     {/* Real-time indicator */}
                     {username.trim().length >= 3 && (
                       <div className="flex items-center gap-1.5 px-1">
@@ -320,20 +320,20 @@ const SignUpPage = () => {
                   </div>
 
                   <div className="flex gap-3 pt-2">
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="lg" 
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="lg"
                       className="flex-1"
                       onClick={() => setStep(1)}
                       icon={<ArrowLeft className="w-4 h-4" />}
                     >
                       Back
                     </Button>
-                    <Button 
-                      type="button" 
-                      variant="accent" 
-                      size="lg" 
+                    <Button
+                      type="button"
+                      variant="accent"
+                      size="lg"
                       className="flex-1"
                       onClick={goToStep3}
                       iconRight={<ArrowRight className="w-4 h-4" />}
@@ -352,7 +352,7 @@ const SignUpPage = () => {
                       What moves you? (Select 3+)
                     </label>
                     <p className="text-[10px] text-text-muted leading-tight">Pick the frequencies that trigger your gravity orbit</p>
-                    
+
                     {/* Interest grid */}
                     <div className="grid grid-cols-2 gap-2.5 pt-2">
                       {interestsList.map((interest) => {
@@ -363,11 +363,10 @@ const SignUpPage = () => {
                             key={interest.id}
                             type="button"
                             onClick={() => handleInterestToggle(interest.id)}
-                            className={`flex items-center gap-2.5 p-3 rounded-ads-md border text-xs font-semibold select-none text-left transition-all duration-200 ${
-                              isSelected
-                                ? 'bg-accent/10 border-accent/30 text-accent shadow-glow-accent/5 scale-[1.02]'
-                                : 'bg-surface border-default text-text-secondary hover:text-text hover:border-border-hover'
-                            }`}
+                            className={`flex items-center gap-2.5 p-3 rounded-ads-md border text-xs font-semibold select-none text-left transition-all duration-200 ${isSelected
+                              ? 'bg-accent/10 border-accent/30 text-accent shadow-glow-accent/5 scale-[1.02]'
+                              : 'bg-surface border-default text-text-secondary hover:text-text hover:border-border-hover'
+                              }`}
                           >
                             <Icon size={14} className={isSelected ? 'text-accent' : 'text-text-muted'} />
                             <span>{interest.label}</span>
@@ -378,20 +377,20 @@ const SignUpPage = () => {
                   </div>
 
                   <div className="flex gap-3 pt-2">
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="lg" 
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="lg"
                       className="flex-1"
                       onClick={() => setStep(2)}
                       icon={<ArrowLeft className="w-4 h-4" />}
                     >
                       Back
                     </Button>
-                    <Button 
-                      type="button" 
-                      variant="accent" 
-                      size="lg" 
+                    <Button
+                      type="button"
+                      variant="accent"
+                      size="lg"
                       className="flex-1"
                       loading={isSigningUp}
                       disabled={selectedInterests.length < 3}

@@ -15,6 +15,38 @@ export const useAuthStore = create((set, get) => ({
   socket: null,
   isSocketConnected: false,
   socketError: null,
+  isForgotPasswordLoading: false,
+  isResetPasswordLoading: false,
+
+  forgotPassword: async (email) => {
+    set({ isForgotPasswordLoading: true });
+    try {
+      const res = await axiosInstance.post("/auth/forgot-password", { email });
+      toast.success(res.data.message || "Reset link sent");
+      return true;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || "Failed to send reset link";
+      toast.error(errorMessage);
+      return false;
+    } finally {
+      set({ isForgotPasswordLoading: false });
+    }
+  },
+
+  resetPassword: async (token, password) => {
+    set({ isResetPasswordLoading: true });
+    try {
+      const res = await axiosInstance.post(`/auth/reset-password/${token}`, { password });
+      toast.success(res.data.message || "Password reset successfully");
+      return true;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || "Failed to reset password";
+      toast.error(errorMessage);
+      return false;
+    } finally {
+      set({ isResetPasswordLoading: false });
+    }
+  },
 
   checkAuth: async () => {
     try {

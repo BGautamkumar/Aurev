@@ -107,9 +107,9 @@ const LoginPage = () => {
                       onChange={(val) => setFormData({ ...formData, rememberMe: val })}
                       label="Remember me"
                     />
-                    <button 
-                      type="button" 
-                      onClick={() => toast('Forgot password? PURGE PROTOCOL required. Contact system core operator.', { icon: '🔑' })}
+                    <button
+                      type="button"
+                      onClick={() => navigate('/forgot-password')}
                       className="text-xs text-accent hover:text-accent transition-colors font-medium cursor-pointer"
                     >
                       Forgot password?
