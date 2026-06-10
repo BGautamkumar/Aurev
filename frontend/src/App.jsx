@@ -45,10 +45,10 @@ const OfflineIndicator = () => {
   if (isOnline) return null;
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[200] animate-slide-up">
-      <div className="flex items-center gap-2.5 px-5 py-3 rounded-ads-lg bg-surface-100 border border-rose/20 shadow-elevation-3">
-        <WifiOff className="w-4 h-4 text-rose" />
-        <span className="text-sm text-text font-medium">You&apos;re offline</span>
-        <span className="text-xs text-text-muted">Messages will send when you reconnect</span>
+      <div className="flex items-center gap-2.5 px-5 py-3 rounded-xl" style={{ background: 'var(--surface)', border: '1px solid rgba(239,68,68,0.2)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+        <WifiOff className="w-4 h-4" style={{ color: 'var(--danger)' }} />
+        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>You&apos;re offline</span>
+        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Messages will send when you reconnect</span>
       </div>
     </div>
   );
@@ -67,8 +67,22 @@ const App = () => {
     // Initialize offline state listener
     const cleanupOffline = useOfflineStore.getState().init();
     
+    const handleVisibilityChange = () => {
+      const auth = useAuthStore.getState();
+      if (!auth.authUser) return;
+      
+      if (document.visibilityState === 'hidden') {
+        auth.disconnectSocket();
+      } else {
+        auth.connectSocket();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
     return () => {
       cleanupOffline();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [checkAuth, initTheme]);
 
@@ -79,10 +93,10 @@ const App = () => {
 
   if (isCheckingAuth && !authUser) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-surface">
+      <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--base)' }}>
         <div className="text-center space-y-4">
           <Spinner size="lg" />
-          <p className="text-text-muted text-sm">Loading AUREV...</p>
+          <p className="text-sm font-mono uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Loading AUREV...</p>
         </div>
       </div>
     );
@@ -99,7 +113,7 @@ const App = () => {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-surface text-text overflow-x-hidden font-sans relative">
+      <div className="min-h-screen overflow-x-hidden font-sans relative" style={{ background: 'var(--base)', color: 'var(--text-primary)' }}>
         <CommandPalette />
         <Routes>
           <Route path="/" element={authUser ? <Navigate to="/messages" /> : <Suspense fallback={<LoadingFallback />}><LandingPage /></Suspense>} />
@@ -125,14 +139,16 @@ const App = () => {
           position="top-right"
           toastOptions={{
             style: {
-              background: '#1A1A1F',
-              color: '#FAFAFA',
-              border: '1px solid rgba(255,255,255,0.06)',
+              background: 'var(--surface)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border)',
               borderRadius: '12px',
               fontSize: '14px',
+              fontFamily: 'Inter, system-ui, sans-serif',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
             },
-            success: { iconTheme: { primary: '#F5C518', secondary: '#09090B' } },
-            error: { iconTheme: { primary: '#F43F5E', secondary: '#09090B' } },
+            success: { iconTheme: { primary: '#22D3EE', secondary: '#050505' } },
+            error: { iconTheme: { primary: '#EF4444', secondary: '#050505' } },
           }}
         />
         <OfflineIndicator />

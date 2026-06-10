@@ -3,12 +3,12 @@ import { cn } from '../../lib/utils';
 import { Loader2 } from 'lucide-react';
 
 const variants = {
-  primary:   'bg-primary text-surface-base border border-transparent shadow-spatial-sm hover:bg-primary-hover hover:shadow-spatial active:scale-[0.98]',
-  secondary: 'bg-surface-100 text-text border border-default hover:bg-surface-200 hover:border-border-active active:scale-[0.98] shadow-spatial-sm',
-  ghost:     'bg-transparent text-text-secondary hover:bg-border/40 hover:text-text active:scale-[0.98]',
-  danger:    'bg-rose/10 text-rose border border-rose/20 hover:bg-rose/20 active:scale-[0.98]',
-  outline:   'bg-transparent border border-default text-text hover:bg-border/30 hover:border-border-active active:scale-[0.98]',
-  accent:    'bg-gradient-to-r from-accent to-accent-hover text-surface-base border border-transparent font-bold hover:from-accent-hover hover:to-accent active:scale-[0.98] transition-all shadow-glow-accent hover:shadow-glow-accent-lg',
+  primary:   'bg-accent text-void border border-accent-hover shadow-accent-glow hover:bg-accent-hover hover:shadow-accent-glow-lg active:scale-[0.96] font-bold',
+  secondary: 'bg-elevated text-text border border-border hover:bg-overlay hover:border-border-lit active:scale-[0.96] shadow-spatial-sm',
+  ghost:     'bg-transparent text-text-secondary hover:bg-white/[0.04] hover:text-text active:scale-[0.96]',
+  danger:    'bg-danger/10 text-danger border border-danger/20 hover:bg-danger/20 active:scale-[0.96]',
+  outline:   'bg-transparent border border-border text-text hover:bg-white/[0.04] hover:border-border-lit active:scale-[0.96]',
+  accent:    'bg-accent text-void border border-accent-hover font-bold hover:bg-accent-hover active:scale-[0.96] transition-all shadow-accent-glow hover:shadow-accent-glow-lg',
 };
 
 const sizes = {
@@ -31,19 +31,19 @@ const Button = forwardRef(({
   fullWidth = false,
   ...props
 }, ref) => {
-  // Graceful fallback for old gold variant
   const safeVariant = variants[variant] ? variant : 'primary';
 
   return (
     <button
       ref={ref}
       className={cn(
-        'inline-flex items-center justify-center font-medium transition-all duration-300 ease-spatial cursor-pointer select-none',
+        'inline-flex items-center justify-center font-medium cursor-pointer select-none',
+        'transition-all duration-fast ease-spring',
         variants[safeVariant],
         sizes[size],
         fullWidth && 'w-full',
         loading && 'cursor-wait pointer-events-none opacity-80',
-        disabled && 'opacity-50 cursor-not-allowed transform-none hover:shadow-none hover:border-default',
+        disabled && 'opacity-40 cursor-not-allowed transform-none hover:shadow-none hover:border-border',
         className
       )}
       disabled={disabled || loading}

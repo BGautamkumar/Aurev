@@ -77,7 +77,7 @@ const ActiveRoomPage = () => {
   const getRankBadgeClass = (tier) => {
     switch (tier?.toLowerCase()) {
       case 'legend': return 'text-accent bg-accent/10 border-accent/25';
-      case 'diamond': return 'text-cyan bg-cyan/10 border-cyan/25';
+      case 'diamond': return 'text-accent bg-accent-subtle border-accent/25';
       case 'platinum': return 'text-indigo-400 bg-indigo-400/10 border-indigo-400/25';
       case 'gold': return 'text-accent-hover bg-accent-hover/10 border-accent-hover/20';
       case 'silver': return 'text-text-secondary bg-surface-200 border-default';

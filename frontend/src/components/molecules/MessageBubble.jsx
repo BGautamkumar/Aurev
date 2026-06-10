@@ -40,20 +40,18 @@ const MessageBubble = memo(({ message, isConsecutive }) => {
     if (!isOwn) return null;
     switch (message.status) {
       case 'seen':
-        return <CheckCheck size={14} className="text-accent" />;
+        return <CheckCheck size={14} style={{ color: 'var(--success)' }} />;
       case 'delivered':
-        return <CheckCheck size={14} className="text-text-muted" />;
+        return <CheckCheck size={14} style={{ color: 'var(--text-muted)' }} />;
       case 'pending':
-        return <div className="w-3 h-3 border-2 border-text-muted/30 border-t-text-muted animate-spin rounded-full" title="Sending..." />;
+        return <div className="w-3 h-3 border-2 animate-spin rounded-full" style={{ borderColor: 'var(--border)', borderTopColor: 'var(--text-muted)' }} title="Sending..." />;
       case 'failed':
-        return <AlertCircle size={14} className="text-rose cursor-pointer" title="Failed to send" />;
+        return <AlertCircle size={14} style={{ color: 'var(--danger)' }} className="cursor-pointer" title="Failed to send" />;
       default:
-        return <Check size={14} className="text-text-disabled" />;
+        return <Check size={14} style={{ color: 'var(--text-muted)' }} />;
     }
   };
 
-  // Only animate if the message is less than 10 seconds old
-  // This prevents history loads from triggering 50+ simultaneous spring animations
   const isRecent = Date.now() - new Date(message.createdAt).getTime() < 10000;
 
   return (
@@ -82,18 +80,31 @@ const MessageBubble = memo(({ message, isConsecutive }) => {
       <div className={`max-w-[75%] lg:max-w-md xl:max-w-lg flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}>
         {/* Sender name */}
         {!isOwn && !isConsecutive && (
-          <div className="text-xs text-text-muted mb-1 px-1 font-medium">{senderName}</div>
+          <div className="text-xs mb-1 px-1 font-medium" style={{ color: 'var(--text-muted)' }}>{senderName}</div>
         )}
 
         {/* Bubble */}
         <div
-          className={`relative group transition-all duration-300 ${message.status === 'pending' ? 'opacity-70' : ''} ${
+          className={`relative group transition-all duration-normal ${message.status === 'pending' ? 'opacity-70' : ''}`}
+          style={
             isEmojiOnly
-              ? 'text-3xl leading-tight py-1'
+              ? { fontSize: '1.875rem', lineHeight: 1.2, padding: '4px 0' }
               : isOwn
-                ? 'bg-primary text-surface-base px-3.5 py-2.5 rounded-[20px] rounded-br-md shadow-spatial-sm border border-transparent'
-                : 'bg-surface-elevated text-text px-3.5 py-2.5 rounded-[20px] rounded-bl-md border border-default shadow-sm'
-          }`}
+                ? {
+                    background: '#2563EB',
+                    borderRadius: '18px 18px 4px 18px',
+                    padding: '10px 14px',
+                    color: '#FFFFFF',
+                    boxShadow: '0 2px 8px rgba(37,99,235,0.25)',
+                  }
+                : {
+                    background: 'var(--bg-elevated)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '18px 18px 18px 4px',
+                    padding: '10px 14px',
+                    color: 'var(--text-200)',
+                  }
+          }
           onClick={handleMessageClick}
         >
           {/* Image */}
@@ -102,7 +113,8 @@ const MessageBubble = memo(({ message, isConsecutive }) => {
               <img
                 src={message.image}
                 alt="Shared image"
-                className="max-w-full rounded-xl hover:opacity-90 transition-opacity border border-default"
+                className="max-w-full rounded-xl hover:opacity-90 transition-opacity"
+                style={{ border: '1px solid var(--border)' }}
                 loading="lazy"
               />
             </div>
@@ -115,17 +127,22 @@ const MessageBubble = memo(({ message, isConsecutive }) => {
                 type="text"
                 value={editText}
                 onChange={(e) => setEditText(e.target.value)}
-                className="bg-surface border border-default text-text px-2 py-1 text-sm flex-1 min-w-[120px] rounded-md focus:outline-none focus:border-border-active"
+                className="px-2 py-1 text-sm flex-1 min-w-[120px] rounded-md outline-none"
+                style={{
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-primary)',
+                }}
                 autoFocus
                 onKeyDown={(e) => { if (e.key === 'Enter') handleSaveEdit(); if (e.key === 'Escape') setIsEditing(false); }}
               />
-              <button onClick={handleSaveEdit} className="text-emerald hover:text-emerald/80"><Save size={14} /></button>
-              <button onClick={() => setIsEditing(false)} className="text-text-muted hover:text-text"><X size={14} /></button>
+              <button onClick={handleSaveEdit} style={{ color: 'var(--success)' }}><Save size={14} /></button>
+              <button onClick={() => setIsEditing(false)} style={{ color: 'var(--text-muted)' }}><X size={14} /></button>
             </div>
           ) : message.text && !isEmojiOnly ? (
             <p className="text-[15px] leading-relaxed break-words">
               {message.text}
-              {message.editedAt && <span className="text-[10px] opacity-60 ml-1.5 font-medium">(edited)</span>}
+              {message.editedAt && <span className="text-[10px] opacity-50 ml-1.5 font-medium">(edited)</span>}
             </p>
           ) : message.text ? (
             <span>{message.text}</span>
@@ -133,11 +150,25 @@ const MessageBubble = memo(({ message, isConsecutive }) => {
 
           {/* Actions on hover (own messages only) */}
           {showActions && isOwn && !isEditing && (
-            <div className={`absolute top-1/2 -translate-y-1/2 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${isOwn ? '-left-14' : '-right-14'}`}>
-              <button onClick={() => { setIsEditing(true); setEditText(message.text || ''); }} className="p-1 rounded-md hover:bg-surface text-text-muted" title="Edit">
+            <div className={`absolute top-1/2 -translate-y-1/2 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-fast ${isOwn ? '-left-14' : '-right-14'}`}>
+              <button
+                onClick={() => { setIsEditing(true); setEditText(message.text || ''); }}
+                className="p-1 rounded-md"
+                style={{ color: 'var(--text-muted)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                title="Edit"
+              >
                 <Pencil size={12} />
               </button>
-              <button onClick={handleDelete} className="p-1 rounded-md hover:bg-rose/10 text-text-muted hover:text-rose" title="Delete">
+              <button
+                onClick={handleDelete}
+                className="p-1 rounded-md"
+                style={{ color: 'var(--text-muted)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)'; e.currentTarget.style.color = 'var(--danger)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+                title="Delete"
+              >
                 <Trash2 size={12} />
               </button>
             </div>
@@ -145,7 +176,7 @@ const MessageBubble = memo(({ message, isConsecutive }) => {
         </div>
 
         {/* Timestamp + Status */}
-        <div className={`flex items-center gap-1.5 mt-1 text-[10px] text-text-muted ${isOwn ? 'flex-row-reverse' : 'flex-row'}`}>
+        <div className={`flex items-center gap-1.5 mt-1 text-[10px] ${isOwn ? 'flex-row-reverse' : 'flex-row'}`} style={{ color: 'var(--text-muted)' }}>
           <span className="font-medium">{formatMessageTime(message.createdAt)}</span>
           {getStatusIcon()}
         </div>

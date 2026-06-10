@@ -58,33 +58,78 @@ const CreateRoomModal = ({ isOpen, onClose }) => {
     { value: 'science', label: 'Science & Cosmos' }
   ];
 
+  const inputStyle = {
+    width: '100%',
+    padding: '10px 14px',
+    background: 'var(--elevated)',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius-md)',
+    color: 'var(--text-primary)',
+    fontSize: '0.875rem',
+    outline: 'none',
+    transition: 'all 140ms',
+    fontFamily: 'Inter, sans-serif',
+  };
+
+  const inputFocusHandler = (e) => {
+    e.currentTarget.style.borderColor = 'var(--border-mid)';
+    e.currentTarget.style.boxShadow = 'inset 3px 0 0 var(--accent-base), 0 0 0 2px var(--accent-subtle)';
+  };
+  const inputBlurHandler = (e) => {
+    e.currentTarget.style.borderColor = 'var(--border)';
+    e.currentTarget.style.boxShadow = 'none';
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(20px)' }} onClick={onClose}>
-      <div 
-        className="ads-surface-elevated w-full max-w-lg overflow-hidden relative shadow-elevation-4 animate-scale-in"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{
+        backgroundColor: 'rgba(5, 5, 5, 0.8)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+      }}
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-lg overflow-hidden relative animate-scale-in"
+        style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: '0 24px 80px rgba(0,0,0,0.8)',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Noise */}
+        <div className="absolute inset-0 charged-noise pointer-events-none" />
+
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-default">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-ads-md bg-accent/10 flex items-center justify-center border border-accent/20">
-              <Plus className="w-4 h-4 text-accent" />
+        <div className="relative z-10 flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid var(--border)' }}>
+          <div className="flex items-center gap-3">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: 'var(--accent-subtle)', border: '1px solid var(--accent-subtle)' }}
+            >
+              <Plus className="w-4 h-4" style={{ color: 'var(--accent-base)' }} />
             </div>
             <div>
-              <h3 className="font-bold text-text text-md">Establish Stream Room</h3>
-              <p className="text-xxs text-text-muted">Spawn a new orbital center of momentum</p>
+              <h3 className="font-semibold text-base" style={{ color: 'var(--text-primary)' }}>Establish Stream Room</h3>
+              <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Spawn a new orbital center of momentum</p>
             </div>
           </div>
-          <button 
+          <button
             onClick={onClose}
-            className="p-1.5 hover:bg-surface-200 rounded-ads-sm transition-colors text-text-muted hover:text-text"
+            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
+            style={{ color: 'var(--text-muted)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--elevated)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}
           >
             <X size={18} />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="relative z-10 p-6 space-y-4">
           <Input
             type="text"
             label="Room Name"
@@ -96,14 +141,16 @@ const CreateRoomModal = ({ isOpen, onClose }) => {
           />
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-text-secondary">Category</label>
+            <label className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>Category</label>
             <select
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-surface text-text rounded-ads-md border border-default focus:border-accent/40 focus:ring-4 focus:ring-accent/5 text-sm outline-none transition-all duration-200"
+              style={inputStyle}
+              onFocus={inputFocusHandler}
+              onBlur={inputBlurHandler}
             >
               {categories.map((c) => (
-                <option key={c.value} value={c.value} className="bg-surface-100">
+                <option key={c.value} value={c.value} style={{ background: 'var(--elevated)' }}>
                   {c.label}
                 </option>
               ))}
@@ -111,48 +158,43 @@ const CreateRoomModal = ({ isOpen, onClose }) => {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-text-secondary">Core Topic / Gravity Focus</label>
+            <label className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>Core Topic / Gravity Focus</label>
             <div className="relative">
-              <Hash className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+              <Hash className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--text-muted)' }} />
               <input
                 type="text"
                 placeholder="e.g. React 19 compiling structures"
                 value={formData.trendingTopic}
                 onChange={(e) => setFormData({ ...formData, trendingTopic: e.target.value })}
-                className="w-full pl-10 pr-4 py-2.5 bg-surface text-text rounded-ads-md border border-default focus:border-accent/40 focus:ring-4 focus:ring-accent/5 text-sm outline-none transition-all duration-200"
+                style={{ ...inputStyle, paddingLeft: 40 }}
+                onFocus={inputFocusHandler}
+                onBlur={inputBlurHandler}
                 required
                 maxLength={50}
               />
             </div>
-            <p className="text-xxs text-text-muted">What is the active thread trending right now in this room?</p>
+            <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>What is the active thread trending right now in this room?</p>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-text-secondary">Description (Optional)</label>
+            <label className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>Description (Optional)</label>
             <textarea
               placeholder="Provide context on what this room accumulates score around..."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              className="w-full px-3.5 py-2.5 bg-surface text-text rounded-ads-md border border-default focus:border-accent/40 focus:ring-4 focus:ring-accent/5 text-sm outline-none transition-all duration-200 resize-none"
+              style={{ ...inputStyle, resize: 'none' }}
+              onFocus={inputFocusHandler}
+              onBlur={inputBlurHandler}
               maxLength={120}
             />
           </div>
 
           <div className="pt-2 flex justify-end gap-3">
-            <Button
-              type="button"
-              variant="ghost"
-              size="md"
-              onClick={onClose}
-            >
+            <Button type="button" variant="ghost" size="md" onClick={onClose}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              variant="accent"
-              size="md"
-            >
+            <Button type="submit" variant="accent" size="md">
               Establish Orbit
             </Button>
           </div>

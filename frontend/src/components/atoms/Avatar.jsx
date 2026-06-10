@@ -17,11 +17,11 @@ const onlineDotSizeMap = {
 };
 
 const gradients = [
-  'from-primary to-primary-hover',
-  'from-accent to-accent-hover',
-  'from-spatial-600 to-spatial-700',
-  'from-indigo-500 to-purple-600',
-  'from-rose-500 to-pink-600',
+  'from-border-mid to-elevated',
+  'from-tier-signal to-elevated',
+  'from-tier-initiate to-tier-signal',
+  'from-surface to-elevated',
+  'from-tier-pulse to-border-mid',
 ];
 
 const getInitials = (name) => {
@@ -36,6 +36,19 @@ const getGradient = (name) => {
   return gradients[index];
 };
 
+const tierRingColors = {
+  bronze:   'ring-tier-initiate',
+  silver:   'ring-tier-signal',
+  gold:     'ring-tier-pulse',
+  diamond:  'ring-tier-orbit',
+  legend:   'ring-tier-nova',
+  initiate: 'ring-tier-initiate',
+  signal:   'ring-tier-signal',
+  pulse:    'ring-tier-pulse',
+  orbit:    'ring-tier-orbit',
+  nova:     'ring-tier-nova',
+};
+
 const Avatar = ({
   src,
   name,
@@ -48,14 +61,6 @@ const Avatar = ({
 }) => {
   const hasImage = src && !src.includes('avatar.png');
 
-  const tierRingColors = {
-    bronze:  'ring-amber-700',
-    silver:  'ring-gray-400',
-    gold:    'ring-primary',
-    diamond: 'ring-accent',
-    legend:  'ring-primary-hover',
-  };
-
   return (
     <div className={cn('relative flex-shrink-0', className)} {...props}>
       <div
@@ -65,7 +70,7 @@ const Avatar = ({
           aurevTier
             ? `ring-2 ${tierRingColors[aurevTier] || 'ring-border'}`
             : online
-              ? 'ring-2 ring-emerald/40'
+              ? 'ring-2 ring-online/60'
               : 'ring-1 ring-border'
         )}
       >
@@ -78,7 +83,7 @@ const Avatar = ({
           />
         ) : (
           <div className={cn(
-            'w-full h-full bg-gradient-to-br flex items-center justify-center font-bold text-surface-base',
+            'w-full h-full bg-gradient-to-br flex items-center justify-center font-bold text-void',
             getGradient(name)
           )}>
             {getInitials(name)}
@@ -86,14 +91,19 @@ const Avatar = ({
         )}
       </div>
 
-      {/* Online indicator */}
+      {/* Online indicator with pulse */}
       {showOnlineIndicator && online && (
         <span
           className={cn(
-            'absolute bottom-0 right-0 bg-emerald rounded-full border-spatial-900',
+            'absolute bottom-0 right-0 rounded-full',
             onlineDotSizeMap[size],
-            'animate-pulse-online'
           )}
+          style={{
+            background: 'var(--online)',
+            borderColor: 'var(--base)',
+            boxShadow: '0 0 6px var(--online)',
+            animation: 'pulse-ring 2s ease-in-out infinite',
+          }}
         />
       )}
     </div>

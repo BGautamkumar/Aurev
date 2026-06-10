@@ -55,7 +55,7 @@ const SignUpPage = () => {
 
   // Interest categories config
   const interestsList = [
-    { id: 'tech', label: 'Technology', icon: Code, color: 'text-cyan bg-cyan/10 border-cyan/20' },
+    { id: 'tech', label: 'Technology', icon: Code, color: 'text-accent bg-accent-subtle border-accent/20' },
     { id: 'gaming', label: 'Gaming', icon: Gamepad2, color: 'text-accent bg-accent/10 border-accent/20' },
     { id: 'music', label: 'Music', icon: Music, color: 'text-indigo-400 bg-indigo-400/10 border-indigo-400/20' },
     { id: 'art', label: 'Art & Design', icon: Palette, color: 'text-rose bg-rose/10 border-rose/20' },
@@ -133,12 +133,12 @@ const SignUpPage = () => {
 
   const benefits = [
     { icon: <Sparkles className="w-5 h-5 text-accent" />, title: 'Free Forever', description: 'No credit card required. Start building momentum instantly.' },
-    { icon: <Users className="w-5 h-5 text-cyan" />, title: 'Stream Rooms', description: 'Create living communities with activity heatmaps and trending topics.' },
+    { icon: <Users className="w-5 h-5 text-accent" />, title: 'Stream Rooms', description: 'Create living communities with activity heatmaps and trending topics.' },
     { icon: <Shield className="w-5 h-5 text-emerald" />, title: 'E2E Encryption', description: 'Bank-level encryption on every message, room, and file by default.' },
   ];
 
   return (
-    <div className="min-h-screen bg-surface flex items-center justify-center p-4 ads-ambient">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{ background: '#FAFAFA' }}>
       <div className="relative w-full max-w-6xl mx-auto z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
 
@@ -146,22 +146,22 @@ const SignUpPage = () => {
           <div className="hidden lg:block text-left space-y-10 animate-fade-in-up">
             <div className="space-y-6">
               <div className="flex items-center gap-3">
-                <div className="w-14 h-14 rounded-ads-xl bg-gradient-to-br from-accent to-accent flex items-center justify-center shadow-glow-accent-lg">
-                  <span className="text-lg font-black text-surface tracking-tight">AU</span>
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #2563EB, #3B82F6)', boxShadow: '0 4px 14px rgba(37,99,235,0.3)' }}>
+                  <span className="text-lg font-black tracking-tight text-white">AU</span>
                 </div>
                 <div>
-                  <h1 className="text-4xl font-bold text-text tracking-tight">
-                    AUR<span className="text-accent">EV</span>
+                  <h1 className="text-4xl font-bold tracking-tight" style={{ color: '#09090B' }}>
+                    AUREV
                   </h1>
-                  <p className="text-xs text-text-muted font-medium tracking-wider uppercase mt-0.5">Join the Momentum</p>
+                  <p className="text-xs font-medium tracking-wider uppercase mt-0.5" style={{ color: '#A1A1AA' }}>Join the Momentum</p>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold ads-text-gradient">
+                <h2 className="text-2xl font-bold" style={{ color: '#09090B' }}>
                   Communication that builds you.
                 </h2>
-                <p className="text-text-secondary text-md leading-relaxed max-w-md">
+                <p className="text-base leading-relaxed max-w-md" style={{ color: '#71717A' }}>
                   Every message you send, every reaction you give, every community you build — it all becomes part of your Aurev.
                 </p>
               </div>
@@ -169,13 +169,13 @@ const SignUpPage = () => {
 
             <div className="space-y-4">
               {benefits.map((benefit, index) => (
-                <div key={index} className="flex items-start gap-4 p-4 rounded-ads-lg bg-surface-50/50 border border-default hover:border-border-hover hover:bg-surface-100 transition-all duration-300 group">
-                  <div className="w-10 h-10 rounded-ads-md bg-surface-100 border border-default flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <div key={index} className="flex items-start gap-4 p-4 rounded-xl transition-all duration-300 group" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300" style={{ background: 'rgba(37,99,235,0.08)', border: '1px solid rgba(37,99,235,0.12)' }}>
                     {benefit.icon}
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-text text-sm mb-0.5">{benefit.title}</h3>
-                    <p className="text-text-muted text-xs leading-relaxed">{benefit.description}</p>
+                    <h3 className="font-semibold text-sm mb-0.5" style={{ color: '#09090B' }}>{benefit.title}</h3>
+                    <p className="text-xs leading-relaxed" style={{ color: '#71717A' }}>{benefit.description}</p>
                   </div>
                 </div>
               ))}

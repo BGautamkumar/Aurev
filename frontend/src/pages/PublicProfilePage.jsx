@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useFriendStore } from '../store/useFriendStore';
 import { useChatStore } from '../store/useChatStore';
 import { axiosInstance } from '../lib/axios';
+import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
   ArrowLeft, MessageSquare, Sparkles,
@@ -16,7 +17,7 @@ const PublicProfilePage = () => {
   const navigate = useNavigate();
   const { friends, sendFriendRequest } = useFriendStore();
   const { setSelectedUser } = useChatStore();
-  
+
   const [profileUser, setProfileUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -34,18 +35,15 @@ const PublicProfilePage = () => {
         setLoading(false);
       }
     };
-
-    if (id) {
-      fetchUserProfile();
-    }
+    if (id) fetchUserProfile();
   }, [id, navigate]);
 
   if (loading || !profileUser) {
     return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
+      <div className="h-full flex items-center justify-center" style={{ background: 'var(--base)' }}>
         <div className="text-center space-y-4">
-          <div className="w-10 h-10 border-2 border-accent/20 border-t-accent rounded-full animate-spin mx-auto" />
-          <p className="text-text-muted text-sm font-mono uppercase tracking-widest">Aligning profile frequency...</p>
+          <div className="w-10 h-10 border-2 rounded-full animate-spin mx-auto" style={{ borderColor: 'var(--border)', borderTopColor: 'var(--accent-base)' }} />
+          <p className="text-sm font-mono uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Aligning profile frequency...</p>
         </div>
       </div>
     );
@@ -58,11 +56,12 @@ const PublicProfilePage = () => {
 
   const getTierDetails = (tier = 'bronze') => {
     switch (tier.toLowerCase()) {
-      case 'legend': return { label: 'Legend Tier', style: 'text-accent bg-accent/10 border-accent/25', ring: 'ring-2 ring-accent shadow-glow-accent/15' };
-      case 'diamond': return { label: 'Diamond Tier', style: 'text-cyan bg-cyan/10 border-cyan/25', ring: 'ring-2 ring-cyan shadow-glow-cyan/15' };
-      case 'platinum': return { label: 'Platinum Tier', style: 'text-indigo-400 bg-indigo-400/10 border-indigo-400/25', ring: 'ring-2 ring-indigo-400/50' };
-      case 'gold': return { label: 'Gold Tier', style: 'text-accent-hover bg-accent-hover/10 border-accent-hover/20', ring: 'ring-1 ring-accent-hover/30' };
-      default: return { label: 'Bronze Tier', style: 'text-orange-600 bg-orange-600/10 border-orange-600/20', ring: 'ring-1 ring-orange-600/10' };
+      case 'legend':   return { label: 'Nova',     color: 'var(--tier-nova)',     ring: '2px solid var(--tier-nova)', glow: '0 0 20px rgba(255,255,255,0.15)' };
+      case 'diamond':  return { label: 'Orbit',    color: 'var(--tier-orbit)',    ring: '2px solid var(--tier-orbit)', glow: '0 0 20px var(--accent-subtle)' };
+      case 'platinum': return { label: 'Orbit',    color: 'var(--tier-orbit)',    ring: '2px solid var(--tier-orbit)', glow: '0 0 16px var(--accent-subtle)' };
+      case 'gold':     return { label: 'Pulse',    color: 'var(--tier-pulse)',    ring: '2px solid var(--tier-pulse)', glow: '0 0 12px var(--accent-subtle)' };
+      case 'silver':   return { label: 'Signal',   color: 'var(--tier-signal)',   ring: '2px solid var(--tier-signal)', glow: 'none' };
+      default:         return { label: 'Initiate', color: 'var(--tier-initiate)', ring: '2px solid var(--tier-initiate)', glow: 'none' };
     }
   };
 
@@ -70,157 +69,200 @@ const PublicProfilePage = () => {
   const tierDetails = getTierDetails(tier);
   const joinDate = new Date(profileUser.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-  // Dynamic achievements based on user's real points
   const achievementsList = [
-    { id: 'first_spike', label: 'First Spike', desc: 'Sent first frequency message', unlocked: profileUser.aurevScore > 0, icon: Sparkles, color: 'text-accent bg-accent/10' },
-    { id: 'gravity_anchor', label: 'Gravity Anchor', desc: 'Accumulated 1,000+ Aurev Score', unlocked: profileUser.aurevScore >= 1000, icon: Crown, color: 'text-cyan bg-cyan/10' },
-    { id: 'silver_badge', label: 'Silver Node', desc: 'Reached Silver tier status parameters', unlocked: profileUser.aurevScore >= 100, icon: Shield, color: 'text-indigo-400 bg-indigo-400/10' },
+    { id: 'first_spike', label: 'First Spike', desc: 'Sent first frequency message', unlocked: profileUser.aurevScore > 0, icon: Sparkles },
+    { id: 'gravity_anchor', label: 'Gravity Anchor', desc: 'Accumulated 1,000+ Aurev Score', unlocked: profileUser.aurevScore >= 1000, icon: Crown },
+    { id: 'silver_badge', label: 'Signal Node', desc: 'Reached Signal tier status', unlocked: profileUser.aurevScore >= 100, icon: Shield },
   ];
 
+  const containerVariants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.08 } },
+  };
+  const itemVariants = {
+    hidden: { opacity: 0, y: 16 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.38, ease: [0.4, 0, 0.2, 1] } },
+  };
+
   return (
-    <div className="h-full pt-8 pb-12 px-6 bg-surface overflow-y-auto custom-scrollbar animate-fade-in">
-      <div className="max-w-2xl mx-auto space-y-6">
-        
+    <div className="h-full overflow-y-auto charged-scrollbar" style={{ background: 'var(--base)' }}>
+      <motion.div
+        className="max-w-2xl mx-auto px-6 pt-8 pb-16 space-y-6"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Back */}
-        <button 
-          onClick={() => navigate(-1)} 
-          className="flex items-center gap-2 text-text-muted hover:text-text transition-colors mb-6 text-sm"
-        >
-          <ArrowLeft size={18} /> Back
-        </button>
+        <motion.div variants={itemVariants}>
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-sm transition-colors"
+            style={{ color: 'var(--text-muted)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text-primary)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; }}
+          >
+            <ArrowLeft size={18} /> Back
+          </button>
+        </motion.div>
 
-        <div className="ads-surface overflow-hidden shadow-elevation-2 relative">
-          {/* Custom Banner Background */}
-          <div className="h-32 bg-gradient-to-r from-accent/40 via-cyan-900/20 to-transparent relative border-b border-default">
-            <div className="absolute inset-0 bg-noise opacity-[0.03]" />
-          </div>
-
-          {/* Profile Header Details */}
-          <div className="px-8 pb-8 pt-0 relative flex flex-col sm:flex-row items-center sm:items-end gap-5 -mt-10">
-            <div className={`rounded-full shrink-0 relative bg-surface p-1 ${tierDetails.ring}`}>
-              <Avatar
-                src={profileUser.profilePic}
-                name={profileUser.fullName}
-                size="xl"
-                online={false}
-              />
-            </div>
-            
-            <div className="flex-1 text-center sm:text-left space-y-2">
-              <div>
-                <h1 className="text-xl font-extrabold text-text tracking-tight flex items-center justify-center sm:justify-start gap-2">
-                  {profileUser.fullName}
-                </h1>
-                <p className="text-xxs text-text-muted font-mono mt-0.5">@{profileUser.email.split('@')[0]}</p>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
-                <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded border uppercase tracking-wider ${tierDetails.style}`}>
-                  {tierDetails.label}
-                </span>
-                <span className="flex items-center gap-1.5 text-xxs text-text-secondary bg-surface-200 border border-default px-2 py-0.5 rounded font-mono">
-                  <Calendar size={11} className="text-text-muted" />
-                  <span>Joined {joinDate}</span>
-                </span>
-              </div>
+        {/* Profile Card */}
+        <motion.div variants={itemVariants}>
+          <div
+            className="relative overflow-hidden"
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-xl)',
+              boxShadow: 'var(--shadow-card)',
+            }}
+          >
+            {/* Banner */}
+            <div className="h-32 relative overflow-hidden" style={{ borderBottom: '1px solid var(--border)' }}>
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, var(--accent-subtle), var(--base), transparent)' }} />
+              <div className="absolute inset-0 charged-noise" style={{ opacity: 0.04 }} />
             </div>
 
-            {/* Actions Grid */}
-            <div className="flex items-center gap-2.5 shrink-0 pt-4 sm:pt-0">
-              <Button
-                variant="accent"
-                size="sm"
-                icon={<MessageSquare size={13} />}
-                onClick={handleOpenChat}
+            {/* Identity */}
+            <div className="px-8 pb-8 pt-0 relative flex flex-col sm:flex-row items-center sm:items-end gap-5 -mt-10">
+              <div
+                className="rounded-full shrink-0 p-0.5"
+                style={{
+                  background: 'var(--surface)',
+                  border: tierDetails.ring,
+                  boxShadow: tierDetails.glow,
+                }}
               >
-                Message
-              </Button>
-              {!friends.some(f => f._id === profileUser._id) && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="bg-surface-200 border border-default hover:bg-surface-300"
-                  onClick={async () => {
-                    try {
-                      await sendFriendRequest(profileUser._id);
-                    } catch {
-                      // Handled by store
-                    }
-                  }}
-                >
-                  Connect
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
+                <Avatar src={profileUser.profilePic} name={profileUser.fullName} size="xl" online={false} />
+              </div>
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="ads-surface p-4 text-center space-y-1">
-            <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest flex items-center justify-center gap-1">
-              <Users size={11} className="text-cyan" /> Status Level
-            </span>
-            <p className="text-sm font-bold text-text mt-1">{tier.toUpperCase()}</p>
-          </div>
-          <div className="ads-surface p-4 text-center space-y-1 bg-accent/5 border border-accent/20">
-            <span className="text-[10px] font-bold text-accent uppercase tracking-widest flex items-center justify-center gap-1">
-              <Trophy size={11} className="text-accent" /> Aurev Score
-            </span>
-            <p className="text-lg font-black font-mono text-accent">{(profileUser.aurevScore || 0).toLocaleString()} AU</p>
-          </div>
-        </div>
+              <div className="flex-1 text-center sm:text-left space-y-2">
+                <div>
+                  <h1 className="text-xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>{profileUser.fullName}</h1>
+                  <p className="text-[11px] font-mono mt-0.5" style={{ color: 'var(--text-muted)' }}>@{profileUser.email.split('@')[0]}</p>
+                </div>
 
-        {/* Dynamic Columns */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Achievements Grid */}
-          <div className="ads-surface p-5 space-y-4">
-            <h3 className="text-xs font-bold text-text-secondary uppercase tracking-widest flex items-center gap-1.5 border-b border-default pb-3">
-              <Crown size={12} className="text-accent" /> Earned Badges
-            </h3>
-            
-            <div className="grid grid-cols-1 gap-2.5">
-              {achievementsList.map((badge) => {
-                const BadgeIcon = badge.icon;
-                return (
-                  <div 
-                    key={badge.id}
-                    className={`flex items-start gap-3 p-3 rounded-ads-md border transition-all duration-200 ${
-                      badge.unlocked 
-                        ? 'bg-surface-100 border-default' 
-                        : 'bg-surface border-default/50 opacity-40 select-none'
-                    }`}
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+                  <span
+                    className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-md uppercase tracking-widest"
+                    style={{
+                      background: `${tierDetails.color}15`,
+                      color: tierDetails.color,
+                      border: `1px solid ${tierDetails.color}30`,
+                    }}
                   >
-                    <div className={`w-8 h-8 rounded-ads-sm flex items-center justify-center shrink-0 border border-default/40 ${badge.color}`}>
-                      <BadgeIcon size={14} className={badge.unlocked ? 'animate-pulse' : ''} />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-text flex items-center gap-1.5">
-                        {badge.label}
-                        {!badge.unlocked && <span className="text-[8px] font-mono text-text-muted bg-surface-200 px-1 py-0.5 rounded uppercase">Locked</span>}
-                      </h4>
-                      <p className="text-[10px] text-text-secondary leading-tight mt-0.5">{badge.desc}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+                    {tierDetails.label} Tier
+                  </span>
+                  <span className="flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 rounded-md" style={{ background: 'var(--elevated)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}>
+                    <Calendar size={10} /> Joined {joinDate}
+                  </span>
+                </div>
+              </div>
 
-          {/* Recent Aurevs Activity Feed */}
-          <div className="ads-surface p-5 space-y-4">
-            <h3 className="text-xs font-bold text-text-secondary uppercase tracking-widest flex items-center gap-1.5 border-b border-default pb-3">
-              <Activity size={12} className="text-cyan" /> Recent Activity
-            </h3>
-            
-            <div className="text-center py-10">
-              <Activity className="w-8 h-8 text-text-muted/30 mx-auto mb-2" />
-              <p className="text-xs text-text-muted">No recent signals recorded.</p>
+              {/* Actions */}
+              <div className="flex items-center gap-2.5 shrink-0 pt-4 sm:pt-0">
+                <Button variant="accent" size="sm" icon={<MessageSquare size={13} />} onClick={handleOpenChat}>
+                  Message
+                </Button>
+                {!friends.some(f => f._id === profileUser._id) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        await sendFriendRequest(profileUser._id);
+                      } catch {
+                        // Handled by store
+                      }
+                    }}
+                  >
+                    Connect
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
+        </motion.div>
+
+        {/* Stats */}
+        <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4">
+          <div
+            className="p-4 text-center space-y-1"
+            style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-card)' }}
+          >
+            <span className="text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-1" style={{ color: 'var(--text-muted)' }}>
+              <Users size={11} style={{ color: 'var(--accent-base)' }} /> Status Level
+            </span>
+            <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{tierDetails.label.toUpperCase()}</p>
+          </div>
+          <div
+            className="p-4 text-center space-y-1"
+            style={{ background: 'var(--accent-subtle)', border: '1px solid var(--border-mid)', borderRadius: 'var(--radius-xl)' }}
+          >
+            <span className="text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-1" style={{ color: 'var(--accent-base)' }}>
+              <Trophy size={11} /> Aurev Score
+            </span>
+            <p className="text-lg font-black font-mono" style={{ color: 'var(--accent-base)' }}>{(profileUser.aurevScore || 0).toLocaleString()} AU</p>
+          </div>
+        </motion.div>
+
+        {/* Two Columns */}
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Badges */}
+          <motion.div variants={itemVariants}>
+            <div
+              className="p-5 space-y-4"
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-card)' }}
+            >
+              <h3 className="text-xs font-bold uppercase tracking-widest flex items-center gap-1.5 pb-3" style={{ color: 'var(--text-secondary)', borderBottom: '1px solid var(--border)' }}>
+                <Crown size={12} style={{ color: 'var(--accent-base)' }} /> Earned Badges
+              </h3>
+              <div className="space-y-2.5">
+                {achievementsList.map((badge) => {
+                  const BadgeIcon = badge.icon;
+                  return (
+                    <div
+                      key={badge.id}
+                      className={`flex items-start gap-3 p-3 rounded-xl transition-all ${!badge.unlocked ? 'opacity-35' : ''}`}
+                      style={{ background: badge.unlocked ? 'var(--elevated)' : 'transparent', border: '1px solid var(--border)' }}
+                    >
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ background: badge.unlocked ? 'var(--accent-subtle)' : 'var(--surface)', border: '1px solid var(--border)' }}
+                      >
+                        <BadgeIcon size={14} style={{ color: badge.unlocked ? 'var(--accent-base)' : 'var(--text-muted)' }} />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold flex items-center gap-1.5" style={{ color: 'var(--text-primary)' }}>
+                          {badge.label}
+                          {!badge.unlocked && <span className="text-[8px] font-mono px-1 py-0.5 rounded uppercase" style={{ background: 'var(--overlay)', color: 'var(--text-muted)' }}>Locked</span>}
+                        </h4>
+                        <p className="text-[10px] leading-tight mt-0.5" style={{ color: 'var(--text-secondary)' }}>{badge.desc}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Activity */}
+          <motion.div variants={itemVariants}>
+            <div
+              className="p-5 space-y-4"
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-card)' }}
+            >
+              <h3 className="text-xs font-bold uppercase tracking-widest flex items-center gap-1.5 pb-3" style={{ color: 'var(--text-secondary)', borderBottom: '1px solid var(--border)' }}>
+                <Activity size={12} style={{ color: 'var(--accent-base)' }} /> Recent Activity
+              </h3>
+              <div className="text-center py-10">
+                <Activity className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--text-muted)', opacity: 0.3 }} />
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No recent signals recorded.</p>
+              </div>
+            </div>
+          </motion.div>
         </div>
 
-      </div>
+      </motion.div>
     </div>
   );
 };

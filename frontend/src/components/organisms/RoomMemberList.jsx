@@ -5,7 +5,7 @@ import { Crown, Sparkles, Shield, User } from 'lucide-react';
 
 const tierDetails = {
   legend: { label: 'Legend', color: 'text-accent', icon: Crown, border: 'ring-2 ring-accent shadow-glow-accent/10' },
-  diamond: { label: 'Diamond', color: 'text-cyan', icon: Sparkles, border: 'ring-2 ring-cyan shadow-glow-cyan/10' },
+  diamond: { label: 'Diamond', color: 'text-accent', icon: Sparkles, border: 'ring-2 ring-accent shadow-accent-glow' },
   platinum: { label: 'Platinum', color: 'text-indigo-400', icon: Shield, border: 'ring-2 ring-indigo-400/50' },
   gold: { label: 'Gold', color: 'text-accent-hover', icon: User, border: 'ring-1 ring-accent-hover/40' },
   silver: { label: 'Silver', color: 'text-text-secondary', icon: User, border: 'ring-1 ring-border' },

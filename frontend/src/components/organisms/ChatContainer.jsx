@@ -75,7 +75,6 @@ const ChatContainer = memo(() => {
   }, [filteredMessages]);
 
   const handleRangeChanged = (range) => {
-    // Find the most recent date label above or at the current visible start index
     let i = range.startIndex;
     while (i >= 0) {
       if (messageGroups[i] && messageGroups[i].type === 'date') {
@@ -88,14 +87,12 @@ const ChatContainer = memo(() => {
 
   if (isMessagesLoading) {
     return (
-      <div className="flex-1 flex flex-col overflow-hidden bg-transparent">
+      <div className="flex-1 flex flex-col overflow-hidden" style={{ background: 'var(--base)' }}>
         <ChatHeader />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center space-y-4">
             <Spinner size="lg" />
-            <div>
-              <p className="text-text-secondary text-sm font-medium">Loading messages...</p>
-            </div>
+            <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Loading messages...</p>
           </div>
         </div>
         <MessageInput />
@@ -107,16 +104,19 @@ const ChatContainer = memo(() => {
 
   if (connectionError && !isMessagesLoading) {
     return (
-      <div className="flex-1 flex flex-col overflow-hidden bg-transparent">
+      <div className="flex-1 flex flex-col overflow-hidden" style={{ background: 'var(--base)' }}>
         <ChatHeader />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center space-y-6 max-w-sm">
-            <div className="w-20 h-20 rounded-2xl bg-rose/10 flex items-center justify-center mx-auto">
-              <WifiOff className="w-10 h-10 text-rose" />
+            <div
+              className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto"
+              style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)' }}
+            >
+              <WifiOff className="w-10 h-10" style={{ color: 'var(--danger)' }} />
             </div>
             <div>
-              <h3 className="text-lg font-medium text-text">Connection Error</h3>
-              <p className="text-sm text-text-muted mt-1">{connectionError}</p>
+              <h3 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>Connection Error</h3>
+              <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>{connectionError}</p>
             </div>
             <Button variant="primary" icon={<RefreshCw size={16} />} onClick={() => loadMessages(selectedUser._id)}>
               Retry
@@ -129,7 +129,10 @@ const ChatContainer = memo(() => {
   }
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden bg-transparent relative">
+    <div className="flex-1 flex flex-col overflow-hidden relative" style={{ background: 'var(--base)' }}>
+      {/* Noise texture */}
+      <div className="absolute inset-0 charged-noise pointer-events-none" />
+
       <ChatHeader />
 
       <div className="flex-1 relative overflow-hidden">
@@ -142,7 +145,15 @@ const ChatContainer = memo(() => {
               exit={{ opacity: 0, y: -10 }}
               className="absolute top-0 left-0 w-full z-10 flex justify-center py-2 pointer-events-none"
             >
-              <div className="text-[11px] text-text-secondary bg-surface/80 backdrop-blur-md px-3 py-1 rounded-full font-medium border border-default shadow-sm">
+              <div
+                className="text-[11px] px-3 py-1 rounded-full font-medium"
+                style={{
+                  background: 'var(--overlay)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-secondary)',
+                }}
+              >
                 {stickyDate}
               </div>
             </motion.div>
@@ -152,18 +163,21 @@ const ChatContainer = memo(() => {
         {filteredMessages.length === 0 ? (
           <div className="flex items-center justify-center h-full pt-20">
             <div className="text-center space-y-4 max-w-xs">
-              <div className="w-16 h-16 rounded-2xl bg-surface border border-default flex items-center justify-center mx-auto shadow-inner-light">
-                <MessageSquare className="w-8 h-8 text-text-muted" strokeWidth={1.5} />
+              <div
+                className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto"
+                style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-inner-light)' }}
+              >
+                <MessageSquare className="w-8 h-8" strokeWidth={1.5} style={{ color: 'var(--text-muted)' }} />
               </div>
               <div>
-                <h3 className="text-base font-medium text-text">No messages yet</h3>
-                <p className="text-xs text-text-muted mt-1">Start the conversation with {selectedUser?.fullName}</p>
+                <h3 className="text-base font-medium" style={{ color: 'var(--text-primary)' }}>No messages yet</h3>
+                <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>Start the conversation with {selectedUser?.fullName}</p>
               </div>
             </div>
           </div>
         ) : (
           <Virtuoso
-            className="spatial-scrollbar"
+            className="charged-scrollbar"
             style={{ height: '100%' }}
             data={messageGroups}
             initialTopMostItemIndex={messageGroups.length - 1}
@@ -173,7 +187,14 @@ const ChatContainer = memo(() => {
               if (group.type === 'date') {
                 return (
                   <div className="flex justify-center py-4">
-                    <div className="text-[11px] text-text-muted bg-surface/50 border border-default px-3 py-1 rounded-full font-medium">
+                    <div
+                      className="text-[11px] px-3 py-1 rounded-full font-medium"
+                      style={{
+                        background: 'var(--overlay)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-muted)',
+                      }}
+                    >
                       {group.date}
                     </div>
                   </div>

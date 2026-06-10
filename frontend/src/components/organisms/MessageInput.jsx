@@ -3,7 +3,6 @@ import { useChatStore } from '../../store/useChatStore';
 import { Send, Paperclip, Smile, Mic, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { emojis } from '../../lib/utils';
-import IconButton from '../atoms/IconButton';
 
 const MessageInput = memo(() => {
   const {
@@ -14,6 +13,7 @@ const MessageInput = memo(() => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [attachment, setAttachment] = useState(null);
   const [isSending, setIsSending] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
   const typingTimeoutRef = useRef(null);
@@ -86,38 +86,81 @@ const MessageInput = memo(() => {
 
   if (!selectedUser) return null;
 
+  const hasContent = text.trim() || attachment;
+
   return (
-    <div className="px-4 py-3 bg-surface/60 backdrop-blur-xl border-t border-default rounded-b-2xl z-10">
+    <div
+      className="px-5 py-3 z-10 flex-shrink-0"
+      style={{
+        background: 'var(--glass-background)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderTop: '1px solid var(--border)',
+      }}
+    >
       {/* Attachment Preview */}
       {attachment && (
-        <div className="mb-3 p-3 bg-surface-elevated rounded-xl flex items-center gap-3 border border-default animate-fade-in shadow-inner-light">
+        <div
+          className="mb-3 p-3 rounded-xl flex items-center gap-3 animate-fade-in"
+          style={{ background: 'var(--elevated)', border: '1px solid var(--border)' }}
+        >
           <img src={attachment} alt="Attachment" className="w-14 h-14 object-cover rounded-md" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-text">Image attached</p>
+            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Image attached</p>
           </div>
-          <IconButton variant="ghost" size="xs" onClick={() => { setAttachment(null); if (fileInputRef.current) fileInputRef.current.value = ''; }} aria-label="Remove attachment">
+          <button
+            onClick={() => { setAttachment(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
+            className="p-1.5 rounded-lg transition-colors"
+            style={{ color: 'var(--text-muted)' }}
+            aria-label="Remove attachment"
+          >
             <X size={14} />
-          </IconButton>
+          </button>
         </div>
       )}
 
       <div className="flex items-end gap-2">
         {/* Attachment */}
         <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
-        <IconButton variant="ghost" onClick={() => fileInputRef.current?.click()} title="Attach file" aria-label="Attach image file">
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          title="Attach file"
+          aria-label="Attach image file"
+          className="w-9 h-9 flex items-center justify-center rounded-xl transition-all duration-fast"
+          style={{ color: 'var(--text-muted)' }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.background = 'var(--elevated)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent'; }}
+        >
           <Paperclip size={18} />
-        </IconButton>
+        </button>
 
         {/* Emoji */}
         <div className="relative">
-          <IconButton variant="ghost" onClick={() => setShowEmojiPicker(!showEmojiPicker)} title="Add emoji" aria-label="Open emoji picker">
+          <button
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            title="Add emoji"
+            aria-label="Open emoji picker"
+            className="w-9 h-9 flex items-center justify-center rounded-xl transition-all duration-fast"
+            style={{ color: 'var(--text-muted)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.background = 'var(--elevated)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent'; }}
+          >
             <Smile size={18} />
-          </IconButton>
+          </button>
           {showEmojiPicker && (
-            <div className="absolute bottom-12 left-0 spatial-surface p-3 w-80 max-h-60 overflow-y-auto z-50 animate-scale-in">
+            <div
+              className="absolute bottom-12 left-0 charged-glass p-3 w-80 max-h-60 overflow-y-auto z-50 animate-scale-in charged-scrollbar"
+              style={{ borderRadius: 'var(--radius-xl)' }}
+            >
               <div className="grid grid-cols-8 gap-1">
                 {emojis.map((emoji) => (
-                  <button key={emoji} onClick={() => handleEmojiSelect(emoji)} className="p-2 hover:bg-surface-elevated rounded-lg transition-colors text-xl">
+                  <button
+                    key={emoji}
+                    onClick={() => handleEmojiSelect(emoji)}
+                    className="p-2 rounded-lg transition-colors text-xl"
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--elevated)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                  >
                     {emoji}
                   </button>
                 ))}
@@ -127,45 +170,68 @@ const MessageInput = memo(() => {
         </div>
 
         {/* Text input */}
-        <div className="flex-1 bg-surface border border-default rounded-xl focus-within:border-border-active focus-within:bg-surface-elevated transition-all duration-300 shadow-inner-light">
+        <div
+          className="flex-1 rounded-2xl transition-all duration-fast"
+          style={{
+            background: 'var(--surface)',
+            border: inputFocused ? '1px solid var(--accent-hover)' : '1px solid var(--border-subtle)',
+            boxShadow: inputFocused ? '0 0 0 3px var(--accent-subtle)' : 'none',
+          }}
+        >
           <textarea
             ref={textareaRef}
             value={text}
             onChange={handleTyping}
             onKeyDown={handleKeyPress}
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => setInputFocused(false)}
             placeholder="Type a message..."
-            className="w-full px-4 py-2.5 bg-transparent resize-none text-base md:text-[15px] text-text placeholder:text-text-muted focus:outline-none"
+            className="w-full px-4 py-2.5 bg-transparent resize-none text-[15px] focus:outline-none"
+            style={{
+              color: 'var(--text-primary)',
+              maxHeight: '120px',
+            }}
             rows={1}
-            style={{ maxHeight: '120px' }}
             aria-label="Type a message"
           />
         </div>
 
         {/* Send / Voice */}
-        {text.trim() || attachment ? (
+        {hasContent ? (
           <button
             onClick={handleSend}
             disabled={isSending}
-            className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 ease-spatial active:scale-95 cursor-pointer ${
-              isSending ? 'bg-primary/50 text-surface-base cursor-not-allowed' : 'bg-primary text-surface-base shadow-spatial-sm hover:bg-primary-hover hover:shadow-md'
-            }`}
+            className="w-10 h-10 flex items-center justify-center rounded-full transition-all duration-fast active:scale-[0.92]"
+            style={{
+              background: isSending ? 'var(--accent-base)' : 'var(--accent-base)',
+              color: 'var(--white-pure)',
+              cursor: isSending ? 'not-allowed' : 'pointer',
+              boxShadow: '0 4px 16px var(--accent-subtle)',
+            }}
+            onMouseEnter={(e) => { if (!isSending) e.currentTarget.style.transform = 'scale(1.1)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
             aria-label="Send message"
           >
             {isSending ? (
-              <div className="w-[18px] h-[18px] border-2 border-spatial-900/30 border-t-spatial-900 animate-spin rounded-full" />
+              <div className="w-[18px] h-[18px] border-2 animate-spin rounded-full" style={{ borderColor: 'var(--accent-subtle)', borderTopColor: 'var(--white-pure)' }} />
             ) : (
               <Send size={18} className="ml-0.5" />
             )}
           </button>
         ) : (
-          <IconButton
-            variant={isRecordingFromStore ? 'danger' : 'ghost'}
+          <button
             onClick={toggleRecording}
-            className={`active:scale-95 ${isRecordingFromStore ? 'animate-pulse' : ''}`}
+            className={`w-10 h-10 flex items-center justify-center rounded-full transition-all duration-fast active:scale-[0.92] ${isRecordingFromStore ? 'animate-pulse' : ''}`}
+            style={{
+              background: isRecordingFromStore ? 'var(--danger)' : 'transparent',
+              color: isRecordingFromStore ? 'var(--white-pure)' : 'var(--text-muted)',
+            }}
+            onMouseEnter={(e) => { if (!isRecordingFromStore) { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.background = 'var(--elevated)'; } }}
+            onMouseLeave={(e) => { if (!isRecordingFromStore) { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent'; } }}
             aria-label={isRecordingFromStore ? 'Stop recording' : 'Start recording'}
           >
             <Mic size={18} />
-          </IconButton>
+          </button>
         )}
       </div>
     </div>

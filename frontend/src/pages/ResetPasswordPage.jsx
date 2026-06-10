@@ -36,7 +36,7 @@ const ResetPasswordPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface flex items-center justify-center p-4 ads-ambient">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{ background: '#FAFAFA' }}>
       <div className="relative w-full max-w-md mx-auto z-10 animate-scale-in">
         <AuthCard 
           title="Establish New Keys" 

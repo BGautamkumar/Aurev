@@ -18,11 +18,15 @@ const io = new Server(server, {
 });
 
 export function getReceiverSocketId(userId) {
-  return userSocketMap[userId];
+  const sockets = userSocketMap[userId];
+  if (sockets && sockets.size > 0) {
+    return userId; // Return the userId itself to target the user's room (updating all their open tabs)
+  }
+  return undefined;
 }
 
-// used to store online users and their socket IDs
-const userSocketMap = {}; // {userId: socketId}
+// used to store online users and their socket IDs (supporting multiple connections per user)
+const userSocketMap = {}; // {userId: Set[socketId]}
 const typingUsers = new Set(); // Set of userIds currently typing
 const userStatuses = new Map(); // Map of userId -> status data
 const messageRateMap = new Map(); // Map of userId -> message timestamps for rate limiting
@@ -94,29 +98,44 @@ io.on("connection", async (socket) => {
   });
 
   const userId = socket.user.userId;
-  userSocketMap[userId] = socket.id;
+  
+  if (!userSocketMap[userId]) {
+    userSocketMap[userId] = new Set();
+  }
+  const isFirstConnection = userSocketMap[userId].size === 0;
+  userSocketMap[userId].add(socket.id);
   socketMetrics.activeConnections++;
   
   // Join user to their own room for personal events
   socket.join(userId);
   
-  // Notify friends (only) about online status
+  // Get all conversation partners for this user (to notify them of status changes)
+  const ConversationModel = (await import("../models/conversation.model.js")).default;
+  const conversations = await ConversationModel.find({ participants: userId });
+  const chatPartnerIds = conversations.flatMap(c => 
+    c.participants.filter(p => p.toString() !== userId.toString()).map(p => p.toString())
+  );
+
   const User = (await import("../models/user.model.js")).default;
   const currentUser = await User.findById(userId).select("friends privacy");
   
-  if (currentUser?.privacy?.showOnlineStatus !== false) {
-    const friendIds = (currentUser?.friends || []).map(f => f.toString());
-    friendIds.forEach(friendId => {
-      const friendSocketId = userSocketMap[friendId];
-      if (friendSocketId) {
-        io.to(friendSocketId).emit("user:status", { userId, status: "online" });
+  const friendIds = (currentUser?.friends || []).map(f => f.toString());
+  const notifyIds = Array.from(new Set([...friendIds, ...chatPartnerIds]));
+
+  if (isFirstConnection && currentUser?.privacy?.showOnlineStatus !== false) {
+    notifyIds.forEach(notifyId => {
+      const friendSockets = userSocketMap[notifyId];
+      if (friendSockets && friendSockets.size > 0) {
+        friendSockets.forEach(socketId => {
+          io.to(socketId).emit("user:status", { userId, status: "online" });
+        });
       }
     });
   }
 
-  // Send online friends to THIS user (not all online users)
-  const onlineFriends = (currentUser?.friends || []).filter(fid => userSocketMap[fid.toString()]).map(fid => fid.toString());
-  socket.emit("getOnlineUsers", onlineFriends);
+  // Send online friends and conversation partners to THIS user
+  const onlineUsers = notifyIds.filter(id => userSocketMap[id] && userSocketMap[id].size > 0);
+  socket.emit("getOnlineUsers", onlineUsers);
   socket.emit("status:list", Array.from(userStatuses.values()));
 
   // ==================== ROOM LIFECYCLE ===================
@@ -416,8 +435,12 @@ io.on("connection", async (socket) => {
       // Populate sender info for frontend
       await savedMessage.populate("senderId", "fullName profilePic");
 
-      // Send to chat room (both users)
-      io.to(roomId).emit("message:new", savedMessage);
+      // Send to chat room (both users) with clientMessageId for deduplication
+      const messagePayload = savedMessage.toObject ? savedMessage.toObject() : savedMessage;
+      if (data.clientMessageId) {
+        messagePayload.clientMessageId = data.clientMessageId;
+      }
+      io.to(roomId).emit("message:new", messagePayload);
       
       // Emit conversation update to receiver
       const receiverSocketId = getReceiverSocketId(data.receiverId);
@@ -629,7 +652,47 @@ io.on("connection", async (socket) => {
   socket.on("messages:get", async (data, callback) => {
     try {
       const { otherUserId, page = 1, limit = 50 } = data;
-      
+
+      // 1. Mark conversation as read in DB and notify user
+      const conversation = await Conversation.findOne({
+        participants: { $all: [userId, otherUserId] },
+      });
+      if (conversation) {
+        conversation.unreadCount.set(userId.toString(), 0);
+        await conversation.save();
+
+        socket.emit("conversation:updated", {
+          conversationId: conversation._id,
+          lastMessage: conversation.lastMessage,
+          unreadCount: 0,
+        });
+      }
+
+      // 2. Mark all incoming unseen messages as 'seen'
+      const unseenMessages = await Message.find({
+        senderId: otherUserId,
+        receiverId: userId,
+        status: { $ne: "seen" }
+      });
+
+      if (unseenMessages.length > 0) {
+        const messageIds = unseenMessages.map(m => m._id);
+        await Message.updateMany(
+          { _id: { $in: messageIds } },
+          { $set: { status: "seen" } }
+        );
+
+        // Notify sender that their messages were seen
+        const roomId = [userId, otherUserId].sort().join("_");
+        messageIds.forEach(msgId => {
+          io.to(roomId).emit("message:seen", {
+            messageId: msgId,
+            seenBy: userId,
+            seenAt: new Date()
+          });
+        });
+      }
+
       const skip = (page - 1) * limit;
       
       const messages = await Message.find({
@@ -750,8 +813,15 @@ io.on("connection", async (socket) => {
       });
       
       if (userId) {
-        // Clean up all user data
-        delete userSocketMap[userId];
+        let isFullyDisconnected = false;
+        if (userSocketMap[userId]) {
+          userSocketMap[userId].delete(socket.id);
+          if (userSocketMap[userId].size === 0) {
+            delete userSocketMap[userId];
+            isFullyDisconnected = true;
+          }
+        }
+
         typingUsers.delete(userId);
         userStatuses.delete(userId);
         messageRateMap.delete(userId);
@@ -765,20 +835,32 @@ io.on("connection", async (socket) => {
         
         socketMetrics.activeConnections--;
         
-        // Notify friends (only) about offline status
-        try {
-          const UserModel = (await import("../models/user.model.js")).default;
-          const disconnectedUser = await UserModel.findById(userId).select("friends");
-          const friendIds = (disconnectedUser?.friends || []).map(f => f.toString());
-          friendIds.forEach(friendId => {
-            const friendSocketId = userSocketMap[friendId];
-            if (friendSocketId) {
-              io.to(friendSocketId).emit("user:status", { userId, status: "offline" });
-              // We need to get the friend's friends list, but for efficiency just notify status
-            }
-          });
-        } catch (e) {
-          logger.error('Error notifying friends on disconnect', { error: e.message });
+        // Notify friends and conversation partners about offline status only when fully disconnected
+        if (isFullyDisconnected) {
+          try {
+            const UserModel = (await import("../models/user.model.js")).default;
+            const disconnectedUser = await UserModel.findById(userId).select("friends");
+            
+            const ConversationModel = (await import("../models/conversation.model.js")).default;
+            const conversations = await ConversationModel.find({ participants: userId });
+            const chatPartnerIds = conversations.flatMap(c => 
+              c.participants.filter(p => p.toString() !== userId.toString()).map(p => p.toString())
+            );
+
+            const friendIds = (disconnectedUser?.friends || []).map(f => f.toString());
+            const notifyIds = Array.from(new Set([...friendIds, ...chatPartnerIds]));
+
+            notifyIds.forEach(notifyId => {
+              const friendSockets = userSocketMap[notifyId];
+              if (friendSockets && friendSockets.size > 0) {
+                friendSockets.forEach(socketId => {
+                  io.to(socketId).emit("user:status", { userId, status: "offline" });
+                });
+              }
+            });
+          } catch (e) {
+            logger.error('Error notifying friends on disconnect', { error: e.message });
+          }
         }
       }
     } catch (error) {

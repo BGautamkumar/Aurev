@@ -1,54 +1,62 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import { useAurevStore } from '../store/useAurevStore';
+import { motion } from 'framer-motion';
 import {
-  ArrowLeft, Trophy, TrendingUp, TrendingDown, Minus,
+  Trophy, TrendingUp, TrendingDown, Minus,
   Users, Globe, Crown, Zap, Shield, Lock
 } from 'lucide-react';
 import Avatar from '../components/atoms/Avatar';
-import Badge from '../components/atoms/Badge';
 
+/* ── Tier Config (Charged Dark) ── */
 const tierConfig = {
-  bronze:  { label: 'Bronze',  color: 'text-amber-700',   bg: 'bg-amber-700/10',   border: 'border-amber-700/20',   gradient: 'from-amber-700 to-amber-900', icon: Shield },
-  silver:  { label: 'Silver',  color: 'text-gray-400',    bg: 'bg-gray-400/10',     border: 'border-gray-400/20',    gradient: 'from-gray-400 to-gray-600', icon: Shield },
-  gold:    { label: 'Gold',    color: 'text-accent',    bg: 'bg-accent/10',     border: 'border-accent/20',    gradient: 'from-accent to-accent', icon: Crown },
-  diamond: { label: 'Diamond', color: 'text-cyan',        bg: 'bg-cyan/10',         border: 'border-cyan/20',        gradient: 'from-cyan to-blue-600', icon: Zap },
-  legend:  { label: 'Legend',  color: 'text-accent',    bg: 'bg-accent/10',     border: 'border-accent/20',    gradient: 'from-accent to-accent-hover', icon: Trophy },
+  bronze:   { label: 'Initiate',  color: 'var(--tier-initiate)', gradient: 'linear-gradient(135deg, #475569, #64748B)', icon: Shield },
+  silver:   { label: 'Signal',    color: 'var(--tier-signal)',   gradient: 'linear-gradient(135deg, var(--accent-subtle), var(--border-mid))', icon: Shield },
+  gold:     { label: 'Pulse',     color: 'var(--tier-pulse)',    gradient: 'linear-gradient(135deg, var(--border-mid), var(--accent-base))', icon: Crown },
+  diamond:  { label: 'Orbit',     color: 'var(--tier-orbit)',    gradient: 'linear-gradient(135deg, var(--accent-base), var(--accent-base))', icon: Zap },
+  legend:   { label: 'Nova',      color: 'var(--tier-nova)',     gradient: 'linear-gradient(135deg, var(--accent-base), #FFFFFF)', icon: Trophy },
 };
 
 const TrendIcon = ({ trend }) => {
-  if (trend === 'up') return <TrendingUp size={14} className="text-emerald" />;
-  if (trend === 'down') return <TrendingDown size={14} className="text-rose" />;
-  return <Minus size={14} className="text-text-muted" />;
+  if (trend === 'up') return <TrendingUp size={14} style={{ color: 'var(--success)' }} />;
+  if (trend === 'down') return <TrendingDown size={14} style={{ color: 'var(--danger)' }} />;
+  return <Minus size={14} style={{ color: 'var(--text-muted)' }} />;
+};
+
+/* ── Animated Counter ── */
+const AnimatedScore = ({ value }) => {
+  const [display, setDisplay] = useState(0);
+  const ref = useRef(null);
+  useEffect(() => {
+    const target = value || 0;
+    const duration = 900;
+    const start = performance.now();
+    const animate = (now) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplay(Math.round(eased * target));
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+  }, [value]);
+  return <span ref={ref}>{display.toLocaleString()}</span>;
 };
 
 const AurevRankPage = () => {
   const navigate = useNavigate();
   const { authUser, socket } = useAuthStore();
   const {
-    aurevScore,
-    aurevTier,
-    aurevRank,
-    leaderboard,
-    isLoadingLeaderboard,
-    getAurevScore,
-    getLeaderboard,
-    subscribeToAurevUpdates,
-    unsubscribeFromAurevUpdates
+    aurevScore, aurevTier, aurevRank, leaderboard,
+    isLoadingLeaderboard, getAurevScore, getLeaderboard,
+    subscribeToAurevUpdates, unsubscribeFromAurevUpdates
   } = useAurevStore();
 
   const [filter, setFilter] = useState('global');
-  const [timeRange] = useState('all');
 
-  useEffect(() => {
-    getAurevScore();
-  }, [getAurevScore]);
-
-  useEffect(() => {
-    getLeaderboard(filter, timeRange);
-  }, [getLeaderboard, filter, timeRange]);
-
+  useEffect(() => { getAurevScore(); }, [getAurevScore]);
+  useEffect(() => { getLeaderboard(filter, 'all'); }, [getLeaderboard, filter]);
   useEffect(() => {
     if (socket) {
       subscribeToAurevUpdates(socket);
@@ -60,18 +68,17 @@ const AurevRankPage = () => {
   const myTier = aurevTier || 'bronze';
   const myRank = aurevRank || '-';
   const myTierConfig = tierConfig[myTier] || tierConfig.bronze;
+  const TierIcon = myTierConfig.icon;
 
-  // Next tier threshold calculation
   const getNextTierThreshold = (tier) => {
     switch (tier) {
-      case 'bronze': return { label: 'Silver', score: 100 };
-      case 'silver': return { label: 'Gold', score: 500 };
-      case 'gold': return { label: 'Diamond', score: 2000 };
-      case 'diamond': return { label: 'Legend', score: 5000 };
+      case 'bronze': return { label: 'Signal', score: 100 };
+      case 'silver': return { label: 'Pulse', score: 500 };
+      case 'gold':   return { label: 'Orbit', score: 2000 };
+      case 'diamond': return { label: 'Nova', score: 5000 };
       default: return { label: 'Max Level', score: 5000 };
     }
   };
-
   const nextTier = getNextTierThreshold(myTier);
   const percentToNext = nextTier.score > myScore ? (myScore / nextTier.score) * 100 : 100;
 
@@ -80,228 +87,238 @@ const AurevRankPage = () => {
     { id: 'friends', label: 'Friends', icon: Users },
   ];
 
-  const timeRanges = [
-    { id: 'all', label: 'All Time' },
-  ];
-
-  // Dynamic Milestones based on caller's real parameters
   const journeyMilestones = [
-    { id: 'm1', label: 'First Spike Spoken', desc: 'Secure connection established, broadcasted first message', date: myScore > 0 ? 'Active' : 'Locked', unlocked: myScore > 0 },
-    { id: 'm2', label: 'Reached Silver Status', desc: 'Crossed 100 Aurev Score parameters', date: myScore >= 100 ? 'Active' : 'Locked', unlocked: myScore >= 100 },
-    { id: 'm3', label: 'Reached Gold Status', desc: 'Crossed 500 Aurev Score parameters', date: myScore >= 500 ? 'Active' : 'Locked', unlocked: myScore >= 500 },
+    { id: 'm1', label: 'First Spike Spoken', desc: 'Broadcasted first message on the network', unlocked: myScore > 0 },
+    { id: 'm2', label: 'Reached Signal Status', desc: 'Crossed 100 Aurev Score parameters', unlocked: myScore >= 100 },
+    { id: 'm3', label: 'Reached Pulse Status', desc: 'Crossed 500 Aurev Score parameters', unlocked: myScore >= 500 },
   ];
 
-  // Podium splits
   const top1 = leaderboard.find(u => u.rank === 1);
   const top2 = leaderboard.find(u => u.rank === 2);
   const top3 = leaderboard.find(u => u.rank === 3);
-
   const listUsers = leaderboard.filter(u => u.rank > 3);
 
+  const containerVariants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.08 } },
+  };
+  const itemVariants = {
+    hidden: { opacity: 0, y: 16 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.38, ease: [0.4, 0, 0.2, 1] } },
+  };
+
   return (
-    <div className="h-full pt-8 pb-12 px-6 bg-surface overflow-y-auto custom-scrollbar animate-fade-in">
-      <div className="max-w-3xl mx-auto space-y-6">
-        
-        {/* Back Link */}
-        <button onClick={() => navigate('/')} className="flex items-center gap-2 text-text-muted hover:text-text transition-colors mb-6 text-sm">
-          <ArrowLeft size={18} /> Back to Chat
-        </button>
+    <div className="h-full overflow-y-auto charged-scrollbar" style={{ background: 'var(--base)' }}>
+      <div className="absolute inset-0 charged-noise pointer-events-none" />
+      <motion.div
+        className="max-w-3xl mx-auto px-6 pt-8 pb-16 space-y-6 relative z-10"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
 
-        {/* Personal Score Card */}
-        <div className="ads-surface overflow-hidden">
-          <div className="relative p-8">
-            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-cyan/3" />
-            <div className="relative flex flex-col sm:flex-row items-center gap-6">
-              <div className="relative">
-                <Avatar src={authUser?.profilePic} name={authUser?.fullName} size="xl" aurevTier={myTier} showOnlineIndicator={false} />
-                <div className={`absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-gradient-to-br ${myTierConfig.gradient} flex items-center justify-center border-2 border-surface-50`}>
-                  <myTierConfig.icon size={14} className="text-white" />
+        {/* ═══════════════════════════════════════
+           PERSONAL SCORE HERO
+           ═══════════════════════════════════════ */}
+        <motion.div variants={itemVariants}>
+          <div
+            className="relative overflow-hidden"
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-xl)',
+              boxShadow: 'var(--shadow-card)',
+            }}
+          >
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(135deg, var(--accent-subtle), transparent 60%)' }} />
+            <div className="absolute inset-0 charged-noise" />
+
+            <div className="relative z-10 p-8">
+              <div className="flex flex-col sm:flex-row items-center gap-6">
+                {/* Avatar with tier ring */}
+                <div className="relative flex-shrink-0">
+                  <Avatar src={authUser?.profilePic} name={authUser?.fullName} size="xl" aurevTier={myTier} showOnlineIndicator={false} />
+                  <div
+                    className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center"
+                    style={{
+                      background: myTierConfig.gradient,
+                      border: '2px solid var(--surface)',
+                      boxShadow: `0 0 12px ${myTierConfig.color}40`,
+                    }}
+                  >
+                    <TierIcon size={14} style={{ color: 'var(--void)' }} />
+                  </div>
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 text-center sm:text-left">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-center gap-3 mb-3">
+                    <h2 className="text-xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>{authUser?.fullName}</h2>
+                    <span
+                      className="text-[10px] font-bold font-mono uppercase tracking-widest px-2.5 py-1 rounded-md"
+                      style={{
+                        background: `${myTierConfig.color}15`,
+                        color: myTierConfig.color,
+                        border: `1px solid ${myTierConfig.color}30`,
+                      }}
+                    >
+                      {myTierConfig.label}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-center sm:justify-start gap-6">
+                    <div>
+                      <span
+                        className="font-mono font-black tracking-tight charged-text-gradient"
+                        style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: 1 }}
+                      >
+                        <AnimatedScore value={myScore} />
+                      </span>
+                      <span className="text-[10px] font-mono uppercase tracking-widest ml-2" style={{ color: 'var(--text-muted)' }}>AU</span>
+                    </div>
+                    <div className="w-px h-10" style={{ background: 'var(--border)' }} />
+                    <div>
+                      <span className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>#{myRank}</span>
+                      <div className="text-[10px] font-mono uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Global</div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="flex-grow text-center sm:text-left">
-                <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-3 mb-2">
-                  <h2 className="text-xl font-bold text-text">{authUser?.fullName}</h2>
-                  <Badge variant="accent" size="md">{myTierConfig.label}</Badge>
-                </div>
-                <div className="flex items-center justify-center sm:justify-start gap-5">
-                  <div>
-                    <span className="text-3xl font-black ads-text-gradient">{myScore}</span>
-                    <span className="text-text-muted text-[11px] font-mono ml-2 uppercase">Aurev Score</span>
+
+              {/* Progress bar */}
+              {myTier !== 'legend' && (
+                <div className="mt-8">
+                  <div className="flex items-center justify-between text-[11px] font-mono mb-2" style={{ color: 'var(--text-muted)' }}>
+                    <span>{myTierConfig.label}</span>
+                    <span>{nextTier.label} — {nextTier.score} pts</span>
                   </div>
-                  <div className="w-px h-8 bg-border" />
-                  <div>
-                    <span className="text-2xl font-bold text-text">#{myRank}</span>
-                    <span className="text-text-muted text-[11px] font-mono ml-2 uppercase">Global Rank</span>
+                  <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--elevated)' }}>
+                    <div
+                      className="h-full rounded-full animate-progress-fill"
+                      style={{
+                        width: `${percentToNext}%`,
+                        background: `linear-gradient(90deg, var(--accent-subtle), var(--accent-base))`,
+                        boxShadow: '0 0 12px var(--accent-subtle)',
+                      }}
+                    />
+                  </div>
+                  <div className="text-[11px] font-mono mt-1.5" style={{ color: 'var(--text-muted)' }}>
+                    {nextTier.score - myScore} pts to next tier
                   </div>
                 </div>
-              </div>
+              )}
             </div>
-
-            {/* Progress to next tier */}
-            {myTier !== 'legend' && (
-              <div className="mt-8 relative">
-                <div className="flex items-center justify-between text-xs text-text-muted mb-2 font-mono">
-                  <span>{myTierConfig.label}</span>
-                  <span>{nextTier.label} — {nextTier.score} pts</span>
-                </div>
-                <div className="h-2 bg-surface-300 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-accent to-accent rounded-full transition-all duration-500" style={{ width: `${percentToNext}%` }} />
-                </div>
-                <div className="text-xs text-text-muted mt-1 font-mono">{nextTier.score - myScore} pts to next tier</div>
-              </div>
-            )}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Podium Controls Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-6 border-t border-default">
-          <h2 className="text-md font-bold text-text flex items-center gap-2">
-            <Trophy size={18} className="text-accent" /> Orbital Leaderboard
-          </h2>
-          
-          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-            <div className="flex gap-1 bg-surface-100 rounded-ads-md p-1 border border-default flex-1 sm:flex-none">
+        {/* ═══════════════════════════════════════
+           LEADERBOARD SECTION
+           ═══════════════════════════════════════ */}
+        <motion.div variants={itemVariants}>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <h2 className="text-base font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+              <Trophy size={18} style={{ color: 'var(--accent-base)' }} /> Orbital Leaderboard
+            </h2>
+
+            <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'var(--elevated)', border: '1px solid var(--border)' }}>
               {filters.map((f) => (
                 <button
                   key={f.id}
                   onClick={() => setFilter(f.id)}
-                  className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-ads-sm text-xs font-semibold transition-all duration-200 ${
-                    filter === f.id ? 'bg-accent/10 text-accent border border-accent/20' : 'text-text-secondary hover:text-text'
-                  }`}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-fast"
+                  style={{
+                    background: filter === f.id ? 'var(--surface)' : 'transparent',
+                    color: filter === f.id ? 'var(--accent-base)' : 'var(--text-secondary)',
+                    boxShadow: filter === f.id ? 'var(--shadow-spatial-sm)' : 'none',
+                  }}
                 >
                   <f.icon size={12} /> {f.label}
                 </button>
               ))}
             </div>
-            
-            <div className="flex gap-1 bg-surface-100 rounded-ads-md p-1 border border-default flex-1 sm:flex-none">
-              {timeRanges.map((t) => (
-                <button
-                  key={t.id}
-                  className="flex-1 sm:flex-none px-3 py-1.5 rounded-ads-sm text-xs font-semibold text-accent bg-accent/10 border border-accent/20"
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
           </div>
-        </div>
+        </motion.div>
 
         {isLoadingLeaderboard ? (
           <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-accent/20 border-t-accent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 rounded-full animate-spin" style={{ borderColor: 'var(--border)', borderTopColor: 'var(--accent-base)' }} />
           </div>
         ) : leaderboard.length === 0 ? (
-          /* PREMIUM CINEMATIC EMPTY STATE */
-          <div className="relative rounded-[24px] border border-default bg-surface-100/30 p-16 text-center overflow-hidden min-h-[350px] flex flex-col items-center justify-center">
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIwLjAyIi8+PC9zdmc+')] mix-blend-overlay" />
-            <div className="absolute w-[200px] h-[200px] bg-accent/5 rounded-full filter blur-[50px] animate-pulse" />
-            
-            <div className="relative z-10 space-y-5 max-w-sm">
-              <div className="w-16 h-16 rounded-full bg-accent/5 border border-accent/10 flex items-center justify-center mx-auto relative">
-                <Trophy className="w-6 h-6 text-accent/40 animate-bounce" />
+          /* Empty State */
+          <motion.div variants={itemVariants}>
+            <div
+              className="relative overflow-hidden text-center py-16 flex flex-col items-center justify-center"
+              style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius-xl)',
+              }}
+            >
+              <div className="absolute inset-0 charged-noise" />
+              <div className="relative w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+                <div className="absolute w-full h-full rounded-full border animate-radar-expand" style={{ borderColor: 'var(--accent-strong)' }} />
+                <div className="absolute w-full h-full rounded-full border animate-radar-expand" style={{ borderColor: 'var(--accent-subtle)', animationDelay: '0.7s' }} />
+                <div className="absolute w-full h-full rounded-full border animate-radar-expand" style={{ borderColor: 'var(--accent-subtle)', animationDelay: '1.4s' }} />
+                <Trophy className="w-8 h-8 relative z-10" strokeWidth={1.5} style={{ color: 'var(--border-mid)' }} />
               </div>
-              
-              <div className="space-y-1.5">
-                <h3 className="text-lg font-bold text-text">
-                  No rankings generated yet
-                </h3>
-                <p className="text-xs text-text-secondary leading-relaxed">
-                  Active contributions and transmissions generate gravity ranks. Speak first on text channels and build your Aurev Score parameters.
-                </p>
-              </div>
+              <h3 className="text-lg font-semibold relative z-10" style={{ color: 'var(--text-primary)' }}>No rankings generated yet</h3>
+              <p className="text-xs mt-2 max-w-xs relative z-10" style={{ color: 'var(--text-muted)' }}>
+                Active contributions generate gravity ranks. Speak first and build your Aurev Score.
+              </p>
             </div>
-          </div>
+          </motion.div>
         ) : (
           <>
-            {/* Podium layout */}
-            <div className="grid grid-cols-3 gap-3.5 items-end pt-12 pb-6 max-w-xl mx-auto select-none">
-              
-              {/* Rank 2 */}
-              {top2 ? (
-                <div className="flex flex-col items-center">
-                  <div className="relative group cursor-pointer mb-2.5">
-                    <div className="ring-2 ring-gray-400 rounded-full p-0.5 shadow-glow-cyan/5">
-                      <Avatar src={top2.profilePic} name={top2.fullName} size="lg" aurevTier={top2.tier} showOnlineIndicator={false} />
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-gray-400 flex items-center justify-center border border-surface text-[10px] font-bold text-surface">
-                      2
-                    </div>
-                  </div>
-                  <div className="w-full bg-surface-100/60 rounded-t-ads-lg border-t border-l border-r border-default p-4 text-center space-y-1 h-32 flex flex-col justify-center">
-                    <p className="text-xs font-bold text-text truncate">@{top2.username}</p>
-                    <p className="text-[10px] font-mono text-gray-400">{top2.aurevScore.toLocaleString()} AU</p>
-                    <p className="text-[8px] font-bold text-text-muted uppercase">Silver Tier</p>
-                  </div>
-                </div>
-              ) : <div />}
+            {/* ── Podium ── */}
+            <motion.div variants={itemVariants} className="grid grid-cols-3 gap-3.5 items-end pt-8 pb-4 max-w-xl mx-auto select-none">
+              {/* #2 */}
+              <PodiumCard user={top2} rank={2} />
+              {/* #1 — elevated */}
+              <PodiumCard user={top1} rank={1} champion />
+              {/* #3 */}
+              <PodiumCard user={top3} rank={3} />
+            </motion.div>
 
-              {/* Rank 1 */}
-              {top1 ? (
-                <div className="flex flex-col items-center -translate-y-2">
-                  <div className="relative group cursor-pointer mb-2">
-                    <Crown className="w-6 h-6 text-accent animate-float absolute -top-5 left-1/2 -translate-x-1/2 drop-shadow-[0_0_8px_rgba(245,197,24,0.4)]" />
-                    <div className="ring-3 ring-accent rounded-full p-0.5 shadow-glow-accent/15">
-                      <Avatar src={top1.profilePic} name={top1.fullName} size="xl" aurevTier={top1.tier} showOnlineIndicator={false} />
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-accent flex items-center justify-center border border-surface text-xs font-black text-surface">
-                      1
-                    </div>
-                  </div>
-                  
-                  <div className="w-full bg-surface-100/80 rounded-t-ads-lg border-t border-l border-r border-accent/30 p-4 text-center space-y-1.5 h-38 shadow-glow-accent/5 flex flex-col justify-center">
-                    <p className="text-xs font-bold text-accent truncate">@{top1.username}</p>
-                    <p className="text-sm font-black text-text font-mono">{top1.aurevScore.toLocaleString()} AU</p>
-                    <p className="text-[8px] font-bold text-accent uppercase tracking-widest">Legend Tier</p>
-                  </div>
-                </div>
-              ) : <div />}
-
-              {/* Rank 3 */}
-              {top3 ? (
-                <div className="flex flex-col items-center">
-                  <div className="relative group cursor-pointer mb-2.5">
-                    <div className="ring-2 ring-orange-800 rounded-full p-0.5">
-                      <Avatar src={top3.profilePic} name={top3.fullName} size="lg" aurevTier={top3.tier} showOnlineIndicator={false} />
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-orange-800 flex items-center justify-center border border-surface text-[10px] font-bold text-surface">
-                      3
-                    </div>
-                  </div>
-                  <div className="w-full bg-surface-100/60 rounded-t-ads-lg border-t border-l border-r border-default p-4 text-center space-y-1 h-28 flex flex-col justify-center">
-                    <p className="text-xs font-bold text-text truncate">@{top3.username}</p>
-                    <p className="text-[10px] font-mono text-orange-800">{top3.aurevScore.toLocaleString()} AU</p>
-                    <p className="text-[8px] font-bold text-text-muted uppercase">Bronze Tier</p>
-                  </div>
-                </div>
-              ) : <div />}
-
-            </div>
-
-            {/* Table Ranks 4+ */}
+            {/* ── Rank 4+ List ── */}
             {listUsers.length > 0 && (
-              <div className="ads-surface overflow-hidden">
-                <div className="divide-y divide-border">
-                  {listUsers.map((user) => {
+              <motion.div variants={itemVariants}>
+                <div
+                  className="overflow-hidden"
+                  style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius-xl)',
+                    boxShadow: 'var(--shadow-card)',
+                  }}
+                >
+                  {listUsers.map((user, i) => {
+                    const isMe = user._id === authUser?._id;
                     return (
                       <div
                         key={user._id}
-                        className="flex items-center gap-4 px-5 py-3.5 hover:bg-surface-200/30 transition-colors"
+                        className="flex items-center gap-4 px-5 py-3.5 transition-all duration-fast cursor-pointer"
+                        style={{
+                          borderBottom: i < listUsers.length - 1 ? '1px solid var(--border)' : 'none',
+                          background: isMe ? 'var(--accent-subtle)' : 'transparent',
+                          borderLeft: isMe ? '3px solid var(--accent-base)' : '3px solid transparent',
+                        }}
+                        onClick={() => navigate(`/profile/${user._id}`)}
+                        onMouseEnter={(e) => { if (!isMe) e.currentTarget.style.background = 'var(--elevated)'; }}
+                        onMouseLeave={(e) => { if (!isMe) e.currentTarget.style.background = 'transparent'; }}
                       >
-                        <div className="w-8 text-center font-bold text-xs text-text-muted font-mono">
+                        <div className="w-8 text-center font-bold text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
                           #{user.rank}
                         </div>
-
                         <Avatar src={user.profilePic} name={user.fullName} size="sm" aurevTier={user.tier} showOnlineIndicator={false} />
                         <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-xs text-text truncate">
-                            {user.fullName}
+                          <div className="font-semibold text-xs truncate" style={{ color: isMe ? 'var(--accent-base)' : 'var(--text-primary)' }}>
+                            {user.fullName} {isMe && <span className="text-[9px] font-mono opacity-60">(you)</span>}
                           </div>
-                          <div className="text-[9px] font-mono text-text-muted leading-tight mt-0.5">@{user.username}</div>
+                          <div className="text-[9px] font-mono mt-0.5" style={{ color: 'var(--text-muted)' }}>@{user.username}</div>
                         </div>
-
                         <div className="text-right">
-                          <div className="font-bold text-xs text-text font-mono">{user.aurevScore.toLocaleString()}</div>
+                          <div className="font-bold text-xs font-mono" style={{ color: 'var(--text-primary)' }}>{user.aurevScore.toLocaleString()}</div>
                           <div className="flex items-center justify-end gap-1 mt-0.5">
                             <TrendIcon trend={user.trend} />
                           </div>
@@ -310,41 +327,128 @@ const AurevRankPage = () => {
                     );
                   })}
                 </div>
-              </div>
+              </motion.div>
             )}
           </>
         )}
 
-        {/* Timeline */}
-        <div className="ads-surface p-6 space-y-6">
-          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-widest flex items-center gap-1.5 border-b border-default pb-3">
-            <Zap size={13} className="text-accent" /> Your Journey Milestones
-          </h3>
-          
-          <div className="relative border-l border-default pl-4 space-y-6 py-2 ml-2">
-            {journeyMilestones.map((milestone) => (
-              <div key={milestone.id} className={`relative space-y-1 ${!milestone.unlocked ? 'opacity-40' : ''}`}>
-                
-                {/* Connector dot */}
-                <div className={`absolute -left-[20.5px] top-1 w-2.5 h-2.5 rounded-full border-2 flex items-center justify-center ${
-                  milestone.unlocked 
-                    ? 'bg-accent border-accent ring-4 ring-accent/10' 
-                    : 'bg-surface border-default/80'
-                }`} />
+        {/* ═══════════════════════════════════════
+           MILESTONES TIMELINE
+           ═══════════════════════════════════════ */}
+        <motion.div variants={itemVariants}>
+          <div
+            className="p-6 space-y-6"
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-xl)',
+              boxShadow: 'var(--shadow-card)',
+            }}
+          >
+            <h3 className="text-xs font-bold uppercase tracking-widest flex items-center gap-1.5 pb-3" style={{ color: 'var(--text-secondary)', borderBottom: '1px solid var(--border)' }}>
+              <Zap size={13} style={{ color: 'var(--accent-base)' }} /> Your Journey Milestones
+            </h3>
 
-                <div className="flex items-baseline justify-between gap-4">
-                  <h4 className="text-xs font-bold text-text flex items-center gap-1.5">
-                    {milestone.label}
-                    {!milestone.unlocked && <Lock size={10} className="text-text-muted" />}
-                  </h4>
-                  <span className="text-[9px] font-mono text-text-muted shrink-0">{milestone.date}</span>
-                </div>
-                <p className="text-[10px] text-text-secondary leading-relaxed">{milestone.desc}</p>
-              </div>
-            ))}
+            <div className="relative pl-4 space-y-6 py-2 ml-2" style={{ borderLeft: '1px solid var(--border)' }}>
+              {journeyMilestones.map((milestone, i) => (
+                <motion.div
+                  key={milestone.id}
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 + i * 0.12, duration: 0.38, ease: [0.4, 0, 0.2, 1] }}
+                  className={`relative space-y-1 ${!milestone.unlocked ? 'opacity-35' : ''}`}
+                >
+                  {/* Connector dot */}
+                  <div
+                    className="absolute -left-[20.5px] top-1 w-2.5 h-2.5 rounded-full"
+                    style={{
+                      background: milestone.unlocked ? 'var(--accent-base)' : 'var(--surface)',
+                      border: milestone.unlocked ? '2px solid var(--accent-base)' : '2px solid var(--border)',
+                      boxShadow: milestone.unlocked ? '0 0 0 4px var(--accent-subtle), 0 0 8px var(--accent-subtle)' : 'none',
+                    }}
+                  />
+                  <div className="flex items-baseline justify-between gap-4">
+                    <h4 className="text-xs font-bold flex items-center gap-1.5" style={{ color: 'var(--text-primary)' }}>
+                      {milestone.label}
+                      {!milestone.unlocked && <Lock size={10} style={{ color: 'var(--text-muted)' }} />}
+                    </h4>
+                    <span className="text-[9px] font-mono shrink-0" style={{ color: milestone.unlocked ? 'var(--accent-base)' : 'var(--text-muted)' }}>
+                      {milestone.unlocked ? 'Unlocked' : 'Locked'}
+                    </span>
+                  </div>
+                  <p className="text-[10px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{milestone.desc}</p>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
+        </motion.div>
 
+      </motion.div>
+    </div>
+  );
+};
+
+/* ── Podium Card ── */
+const PodiumCard = ({ user, rank, champion }) => {
+  if (!user) return <div />;
+  const tierCfg = tierConfig[user.tier] || tierConfig.bronze;
+  const heights = { 1: 'h-40', 2: 'h-32', 3: 'h-28' };
+  const rankColors = {
+    1: { bg: 'var(--accent-base)', shadow: '0 0 16px var(--accent-strong)' },
+    2: { bg: 'var(--tier-initiate)', shadow: 'none' },
+    3: { bg: 'var(--tier-initiate)', shadow: 'none' },
+  };
+
+  return (
+    <div className={`flex flex-col items-center ${champion ? '-translate-y-3' : ''}`}>
+      <div className="relative group cursor-pointer mb-2.5">
+        {champion && (
+          <Crown
+            className="w-6 h-6 absolute -top-6 left-1/2 -translate-x-1/2 animate-float"
+            style={{ color: 'var(--accent-base)', filter: 'drop-shadow(0 0 8px var(--accent-strong))' }}
+          />
+        )}
+        <div
+          className="rounded-full p-0.5"
+          style={{
+            boxShadow: champion ? '0 0 20px var(--accent-strong)' : 'none',
+            border: champion ? '2px solid var(--accent-base)' : `2px solid ${tierCfg.color}`,
+          }}
+        >
+          <Avatar src={user.profilePic} name={user.fullName} size={champion ? 'xl' : 'lg'} aurevTier={user.tier} showOnlineIndicator={false} />
+        </div>
+        <div
+          className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold"
+          style={{
+            background: rankColors[rank].bg,
+            boxShadow: rankColors[rank].shadow,
+            color: rank === 1 ? 'var(--void)' : 'var(--white-pure)',
+            border: '2px solid var(--surface)',
+          }}
+        >
+          {rank}
+        </div>
+      </div>
+
+      <div
+        className={`w-full ${heights[rank]} rounded-t-xl p-3 text-center flex flex-col justify-center space-y-1`}
+        style={{
+          background: champion ? 'var(--accent-subtle)' : 'var(--elevated)',
+          borderTop: champion ? '1px solid var(--border-mid)' : '1px solid var(--border)',
+          borderLeft: '1px solid var(--border)',
+          borderRight: '1px solid var(--border)',
+          boxShadow: champion ? '0 -4px 20px var(--accent-subtle)' : 'none',
+        }}
+      >
+        <p className="text-[11px] font-bold truncate" style={{ color: champion ? 'var(--accent-base)' : 'var(--text-primary)' }}>
+          @{user.username}
+        </p>
+        <p className="text-[10px] font-mono font-bold" style={{ color: champion ? 'var(--accent-base)' : 'var(--text-secondary)' }}>
+          {user.aurevScore.toLocaleString()} AU
+        </p>
+        <p className="text-[8px] font-bold uppercase tracking-widest" style={{ color: tierCfg.color }}>
+          {tierCfg.label}
+        </p>
       </div>
     </div>
   );

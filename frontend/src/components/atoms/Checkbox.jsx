@@ -10,17 +10,17 @@ const Checkbox = ({ checked, onChange, disabled = false, label, className }) => 
         aria-checked={checked}
         disabled={disabled}
         onClick={() => !disabled && onChange?.(!checked)}
-        className={cn(
-          'w-[18px] h-[18px] rounded-[5px] border-2 flex items-center justify-center transition-all duration-150',
-          checked
-            ? 'bg-accent border-accent'
-            : 'bg-transparent border-surface-400 group-hover:border-text-muted'
-        )}
+        className="w-[18px] h-[18px] rounded-[5px] flex items-center justify-center transition-all duration-fast"
+        style={{
+          background: checked ? 'var(--accent-base)' : 'transparent',
+          border: checked ? '2px solid var(--accent-base)' : '2px solid var(--border-lit)',
+          boxShadow: checked ? '0 0 8px var(--accent-subtle)' : 'none',
+        }}
       >
-        {checked && <Check className="w-3 h-3 text-text-inverse" strokeWidth={3} />}
+        {checked && <Check className="w-3 h-3" strokeWidth={3} style={{ color: 'var(--void)' }} />}
       </button>
       {label && (
-        <span className="text-sm text-text-secondary select-none">{label}</span>
+        <span className="text-sm select-none" style={{ color: 'var(--text-secondary)' }}>{label}</span>
       )}
     </label>
   );

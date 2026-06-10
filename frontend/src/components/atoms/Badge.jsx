@@ -1,13 +1,14 @@
 import { cn } from '../../lib/utils';
 
 const variants = {
-  gold:    'bg-accent/10 text-accent border border-accent/20',
-  accent:  'bg-accent/10 text-accent border border-accent/20',
-  cyan:    'bg-cyan/10 text-cyan border border-cyan/20',
-  emerald: 'bg-emerald/10 text-emerald border border-emerald/20',
-  rose:    'bg-rose/10 text-rose border border-rose/20',
-  muted:   'bg-surface text-text-muted border border-default',
-  solid:   'bg-primary text-surface-base border-none shadow-spatial-sm',
+  primary: 'bg-accent-subtle text-accent border border-accent/20',
+  accent:  'bg-accent-subtle text-accent border border-accent/20',
+  gold:    'bg-accent-subtle text-accent border border-accent/20',
+  emerald: 'bg-success/10 text-success border border-success/20',
+  rose:    'bg-danger/10 text-danger border border-danger/20',
+  muted:   'bg-overlay text-text-muted border border-border',
+  solid:   'bg-accent text-void border-none shadow-accent-glow-sm font-bold',
+  tier:    'bg-white/5 text-white-soft border border-white/10',
 };
 
 const sizes = {
@@ -19,24 +20,23 @@ const sizes = {
 
 const Badge = ({
   children,
-  variant = 'accent',
+  variant = 'primary',
   size = 'sm',
   dot = false,
   className,
   ...props
 }) => {
-  const safeVariant = variants[variant] ? variant : 'accent';
+  const safeVariant = variants[variant] ? variant : 'primary';
 
   if (dot) {
     return (
       <span
         className={cn(
           'inline-block w-2 h-2 rounded-full',
-          safeVariant === 'gold' && 'bg-accent shadow-[0_0_8px_rgba(245,197,24,0.4)]',
-          safeVariant === 'accent' && 'bg-accent shadow-[0_0_8px_rgba(59,130,246,0.4)]',
-          safeVariant === 'cyan' && 'bg-cyan shadow-[0_0_8px_rgba(34,211,238,0.4)]',
-          safeVariant === 'emerald' && 'bg-emerald shadow-[0_0_8px_rgba(16,185,129,0.4)]',
-          safeVariant === 'rose' && 'bg-rose shadow-[0_0_8px_rgba(244,63,94,0.4)]',
+          safeVariant === 'primary' && 'bg-accent shadow-[0_0_8px_var(--accent-strong)]',
+          safeVariant === 'accent' && 'bg-accent shadow-[0_0_8px_var(--accent-strong)]',
+          safeVariant === 'emerald' && 'bg-success shadow-[0_0_8px_rgba(16,185,129,0.4)]',
+          safeVariant === 'rose' && 'bg-danger shadow-[0_0_8px_rgba(239,68,68,0.4)]',
           safeVariant === 'muted' && 'bg-text-muted',
           className
         )}

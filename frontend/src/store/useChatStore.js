@@ -456,6 +456,15 @@ export const useChatStore = create((set, get) => ({
             : message.senderId;
           
           if (senderId === selectedUser?._id || message.receiverId === selectedUser?._id) {
+            if (senderId === selectedUser?._id) {
+              setTimeout(() => {
+                get().markMessageAsSeen(message._id);
+                const conversation = get().conversations.find(c => c.otherUser?._id === selectedUser._id);
+                if (conversation) {
+                  get().markConversationAsRead(conversation._id);
+                }
+              }, 0);
+            }
             return { messages: [...state.messages, message] };
           }
           
@@ -641,7 +650,18 @@ export const useChatStore = create((set, get) => ({
   },
 
   // UI state setters
-  setSelectedUser: (selectedUser) => set({ selectedUser }),
+  setSelectedUser: (selectedUser) => {
+    set({ selectedUser });
+    if (selectedUser) {
+      const { conversations } = get();
+      const conversation = conversations.find(
+        (c) => c.otherUser?._id === selectedUser._id
+      );
+      if (conversation && conversation.unreadCount > 0) {
+        get().markConversationAsRead(conversation._id);
+      }
+    }
+  },
   setSearchQuery: (searchQuery) => set({ searchQuery }),
   setActiveTab: (activeTab) => set({ activeTab }),
   setShowStatusModal: (showStatusModal) => set({ showStatusModal }),

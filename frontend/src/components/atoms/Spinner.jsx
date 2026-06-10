@@ -1,6 +1,6 @@
 import { cn } from '../../lib/utils';
 
-const Spinner = ({ size = 'md', className, gold = true }) => {
+const Spinner = ({ size = 'md', className }) => {
   const sizes = {
     xs: 'w-3.5 h-3.5 border-[1.5px]',
     sm: 'w-5 h-5 border-2',
@@ -11,14 +11,11 @@ const Spinner = ({ size = 'md', className, gold = true }) => {
 
   return (
     <div
-      className={cn(
-        'rounded-full animate-spin',
-        sizes[size],
-        gold
-          ? 'border-accent/20 border-t-accent'
-          : 'border-text-muted/20 border-t-text-secondary',
-        className
-      )}
+      className={cn('rounded-full animate-spin', sizes[size], className)}
+      style={{
+        borderColor: 'var(--border)',
+        borderTopColor: 'var(--accent-base)',
+      }}
       role="status"
       aria-label="Loading"
     >

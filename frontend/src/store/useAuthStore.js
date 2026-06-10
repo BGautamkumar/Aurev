@@ -177,7 +177,12 @@ export const useAuthStore = create((set, get) => ({
     });
 
     socket.on("disconnect", () => {
-      set({ isSocketConnected: false });
+      set({ isSocketConnected: false, onlineUsers: [] });
+      import("./useChatStore.js")
+        .then(({ useChatStore }) => {
+          useChatStore.setState({ onlineUsers: new Set() });
+        })
+        .catch(() => {});
     });
 
     socket.on("connect_error", (error) => {
@@ -187,13 +192,53 @@ export const useAuthStore = create((set, get) => ({
 
     socket.on("getOnlineUsers", (userIds) => {
       set({ onlineUsers: userIds });
+      import("./useChatStore.js")
+        .then(({ useChatStore }) => {
+          useChatStore.setState({ onlineUsers: new Set(userIds) });
+        })
+        .catch(() => {});
+    });
+
+    socket.on("user:status", (data) => {
+      set((state) => {
+        const currentList = state.onlineUsers || [];
+        let updatedList;
+        if (data.status === "online") {
+          if (!currentList.includes(data.userId)) {
+            updatedList = [...currentList, data.userId];
+          } else {
+            updatedList = currentList;
+          }
+        } else {
+          updatedList = currentList.filter((id) => id !== data.userId);
+        }
+
+        import("./useChatStore.js")
+          .then(({ useChatStore }) => {
+            const newSet = new Set(useChatStore.getState().onlineUsers);
+            if (data.status === "online") {
+              newSet.add(data.userId);
+            } else {
+              newSet.delete(data.userId);
+            }
+            useChatStore.setState({ onlineUsers: newSet });
+          })
+          .catch(() => {});
+
+        return { onlineUsers: updatedList };
+      });
     });
   },
   disconnectSocket: () => {
     const socket = get().socket;
-    if (socket?.connected) {
+    if (socket) {
       socket.disconnect();
-      set({ socket: null, isSocketConnected: false });
+      set({ socket: null, isSocketConnected: false, onlineUsers: [] });
+      import("./useChatStore.js")
+        .then(({ useChatStore }) => {
+          useChatStore.setState({ onlineUsers: new Set() });
+        })
+        .catch(() => {});
     }
   },
   clearAuth: () => {

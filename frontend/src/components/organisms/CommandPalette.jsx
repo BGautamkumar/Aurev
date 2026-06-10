@@ -7,8 +7,8 @@ import { useThemeStore } from '../../store/useThemeStore';
 import { useFriendStore } from '../../store/useFriendStore';
 import { useChatStore } from '../../store/useChatStore';
 import Avatar from '../atoms/Avatar';
-import { 
-  Search, Settings, User, Compass, Trophy, LogOut, 
+import {
+  Search, Settings, User, Compass, Trophy, LogOut,
   Moon, Sun, Users, Plus, Clock, X, MessageSquare
 } from 'lucide-react';
 
@@ -24,19 +24,15 @@ const CommandPalette = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef(null);
 
-  // Focus trap and scroll lock
   useEffect(() => {
     if (isCommandPaletteOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
-    return () => {
-      document.body.style.overflow = '';
-    };
+    return () => { document.body.style.overflow = ''; };
   }, [isCommandPaletteOpen]);
 
-  // Focus input when opened
   useEffect(() => {
     if (isCommandPaletteOpen) {
       setQuery('');
@@ -46,60 +42,53 @@ const CommandPalette = () => {
     }
   }, [isCommandPaletteOpen, clearSearch]);
 
-  // Handle Search
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (query.trim().length >= 2) searchUsers(query.trim());
       else clearSearch();
-      setSelectedIndex(0); // Reset selection on new search
+      setSelectedIndex(0);
     }, 300);
     return () => clearTimeout(timeout);
   }, [query, searchUsers, clearSearch]);
 
-  const handleClose = () => {
-    closeCommandPalette();
-  };
+  const handleClose = () => closeCommandPalette();
 
-  // Commands
-  const navigationCommands = [
-    { id: 'nav-home', label: 'Go to Chat', icon: MessageSquare, action: () => navigate('/') },
-    { id: 'nav-rooms', label: 'Go to Frequencies (Rooms)', icon: Compass, action: () => navigate('/rooms') },
-    { id: 'nav-aurevrank', label: 'Go to Aurev Rank', icon: Trophy, action: () => navigate('/aurev-rank') },
-    { id: 'nav-settings', label: 'Go to Settings', icon: Settings, action: () => navigate('/settings') },
-    { id: 'nav-profile', label: 'Go to Profile', icon: User, action: () => navigate('/profile') },
-  ];
+  const navigationCommands = React.useMemo(() => [
+    { id: 'nav-home', label: 'Go to Chat', icon: MessageSquare, type: 'command', action: () => navigate('/') },
+    { id: 'nav-rooms', label: 'Go to Frequencies (Rooms)', icon: Compass, type: 'command', action: () => navigate('/rooms') },
+    { id: 'nav-aurevrank', label: 'Go to Aurev Rank', icon: Trophy, type: 'command', action: () => navigate('/aurev-rank') },
+    { id: 'nav-settings', label: 'Go to Settings', icon: Settings, type: 'command', action: () => navigate('/settings') },
+    { id: 'nav-profile', label: 'Go to Profile', icon: User, type: 'command', action: () => navigate('/profile') },
+  ], [navigate]);
 
-  const actionCommands = [
-    { 
-      id: 'action-theme', 
-      label: `Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`, 
-      icon: theme === 'dark' ? Sun : Moon, 
-      action: () => setTheme(theme === 'dark' ? 'light' : 'dark') 
+  const actionCommands = React.useMemo(() => [
+    {
+      id: 'action-theme',
+      label: `Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`,
+      icon: theme === 'dark' ? Sun : Moon,
+      type: 'command',
+      action: () => setTheme(theme === 'dark' ? 'light' : 'dark')
     },
-    { id: 'action-logout', label: 'Log Out', icon: LogOut, action: () => { logout(); navigate('/login'); }, destructive: true },
-  ];
+    { id: 'action-logout', label: 'Log Out', icon: LogOut, type: 'command', action: () => { logout(); navigate('/login'); }, destructive: true },
+  ], [theme, setTheme, logout, navigate]);
 
-  // Filter commands based on query
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const filteredNavCommands = React.useMemo(() => navigationCommands.filter(c => c.label.toLowerCase().includes(query.toLowerCase())), [query]);
+  const filteredNavCommands = React.useMemo(() => navigationCommands.filter(c => c.label.toLowerCase().includes(query.toLowerCase())), [query, navigationCommands]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const filteredActionCommands = React.useMemo(() => actionCommands.filter(c => c.label.toLowerCase().includes(query.toLowerCase())), [query, theme]);
+  const filteredActionCommands = React.useMemo(() => actionCommands.filter(c => c.label.toLowerCase().includes(query.toLowerCase())), [query, theme, actionCommands]);
 
-  // Flatten items for keyboard navigation using useMemo to prevent unnecessary array creation
   const allItems = React.useMemo(() => [
-    ...filteredNavCommands.map(c => ({ ...c, type: 'command' })),
-    ...filteredActionCommands.map(c => ({ ...c, type: 'command' })),
+    ...filteredNavCommands,
+    ...filteredActionCommands,
     ...(searchResults || []).map(u => ({ ...u, type: 'user' }))
   ], [filteredNavCommands, filteredActionCommands, searchResults]);
 
   const executeAction = (item) => {
     if (!item) return;
-    
     if (item.type === 'command') {
       item.action();
       handleClose();
     } else if (item.type === 'user') {
-      // User action: Chat if friend, otherwise request
       if (item.friendshipStatus === 'accepted') {
         setSelectedUser(item);
         navigate('/');
@@ -110,11 +99,9 @@ const CommandPalette = () => {
     }
   };
 
-  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!isCommandPaletteOpen) return;
-
       if (e.key === 'ArrowDown') {
         e.preventDefault();
         setSelectedIndex(prev => (prev < allItems.length - 1 ? prev + 1 : prev));
@@ -126,41 +113,29 @@ const CommandPalette = () => {
         executeAction(allItems[selectedIndex]);
       }
     };
-
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCommandPaletteOpen, allItems, selectedIndex]);
 
-  // Framer Motion Variants
-  const overlayVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-    exit: { opacity: 0, transition: { duration: 0.15 } }
-  };
-
-  const modalVariants = {
-    hidden: { opacity: 0, scale: 0.95, y: -20 },
-    visible: { 
-      opacity: 1, 
-      scale: 1, 
-      y: 0,
-      transition: { type: 'spring', damping: 25, stiffness: 300 }
-    },
-    exit: { opacity: 0, scale: 0.95, y: -10, transition: { duration: 0.15 } }
-  };
-
-
   const renderUserAction = (user) => {
-    if (user._id === authUser?._id) return <span className="text-xs text-text-muted">You</span>;
+    if (user._id === authUser?._id) return <span className="text-xs" style={{ color: 'var(--text-muted)' }}>You</span>;
     if (user.friendshipStatus === 'accepted') {
-      return <span className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-widest text-emerald px-2.5 py-1 rounded-sm bg-emerald/10"><MessageSquare size={12} /> Chat</span>;
+      return (
+        <span className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-md" style={{ color: 'var(--success)', background: 'rgba(16,185,129,0.1)' }}>
+          <MessageSquare size={12} /> Chat
+        </span>
+      );
     }
     if (user.friendshipStatus === 'pending') {
-      return <span className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-widest text-text-muted px-2.5 py-1 rounded-sm bg-surface-200"><Clock size={12} /> Pending</span>;
+      return (
+        <span className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-md" style={{ color: 'var(--text-muted)', background: 'var(--overlay)' }}>
+          <Clock size={12} /> Pending
+        </span>
+      );
     }
     return (
-      <span className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-widest text-accent px-2.5 py-1 rounded-sm bg-accent/10 border border-accent/20">
+      <span className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-md" style={{ color: 'var(--accent-base)', background: 'var(--accent-subtle)', border: '1px solid var(--accent-strong)' }}>
         <Plus size={12} /> Add
       </span>
     );
@@ -170,136 +145,162 @@ const CommandPalette = () => {
     <AnimatePresence>
       {isCommandPaletteOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-start justify-center pt-safe md:pt-[15vh] px-4 bg-surface-base/60 backdrop-blur-sm"
-          variants={overlayVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
+          className="fixed inset-0 z-50 flex items-start justify-center pt-safe md:pt-[15vh] px-4"
+          style={{
+            background: 'rgba(5, 5, 5, 0.7)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, transition: { duration: 0.15 } }}
           onClick={handleClose}
         >
           <motion.div
             role="dialog"
             aria-modal="true"
             aria-label="Command Palette"
-            className="w-full max-w-2xl mt-4 md:mt-0 bg-surface border border-default shadow-elevation-3 rounded-2xl overflow-hidden flex flex-col max-h-[70vh] md:max-h-[70vh]"
-            variants={modalVariants}
+            className="w-full max-w-2xl mt-4 md:mt-0 overflow-hidden flex flex-col max-h-[70vh]"
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-2xl)',
+              boxShadow: '0 24px 80px rgba(0,0,0,0.8)',
+            }}
+            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0, transition: { type: 'spring', damping: 25, stiffness: 300 } }}
+            exit={{ opacity: 0, scale: 0.95, y: -10, transition: { duration: 0.15 } }}
             onClick={(e) => e.stopPropagation()}
           >
-          {/* Search Header */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-default bg-surface/80">
-            <Search className="w-5 h-5 text-text-muted" />
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="Search users or type a command..."
-              className="flex-1 bg-transparent text-text text-base outline-none placeholder-text-muted font-medium"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono text-text-muted border border-default px-1.5 py-0.5 rounded bg-surface-200">ESC</span>
-              <button onClick={handleClose} className="p-1 hover:bg-surface-200 rounded-md transition-colors text-text-muted hover:text-text">
-                <X size={16} />
-              </button>
+            {/* Search Header */}
+            <div className="flex items-center gap-3 px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+              <Search className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+              <input
+                ref={inputRef}
+                type="text"
+                placeholder="Search users or type a command..."
+                className="flex-1 bg-transparent text-base outline-none font-medium"
+                style={{ color: 'var(--text-primary)', fontFamily: 'Inter, sans-serif' }}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded" style={{ color: 'var(--text-muted)', background: 'var(--elevated)', border: '1px solid var(--border)' }}>ESC</span>
+                <button
+                  onClick={handleClose}
+                  className="p-1 rounded-md transition-colors"
+                  style={{ color: 'var(--text-muted)' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--elevated)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Scrollable Results Area */}
-          <div className="overflow-y-auto spatial-scrollbar py-2">
-            
-            {/* Empty State */}
-            {allItems.length === 0 && (
-              <div className="px-4 py-8 text-center text-text-muted text-sm">
-                No results found for &quot;{query}&quot;
-              </div>
-            )}
-
-            {/* Navigation Commands */}
-            {filteredNavCommands.length > 0 && (
-              <div className="mb-2">
-                <div className="px-4 py-1.5 text-xs font-bold text-text-secondary uppercase tracking-widest">Navigation</div>
-                {filteredNavCommands.map((item) => {
-                  const index = allItems.indexOf(item);
-                  const isSelected = index === selectedIndex;
-                  return (
-                    <div
-                      key={item.id}
-                      className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors ${isSelected ? 'bg-surface-200 border-l-2 border-accent' : 'border-l-2 border-transparent hover:bg-surface-100'}`}
-                      onClick={() => executeAction(item)}
-                      onMouseEnter={() => setSelectedIndex(index)}
-                    >
-                      <item.icon size={16} className={isSelected ? 'text-text' : 'text-text-muted'} />
-                      <span className={`text-sm font-medium ${isSelected ? 'text-text' : 'text-text-secondary'}`}>{item.label}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Action Commands */}
-            {filteredActionCommands.length > 0 && (
-              <div className="mb-2">
-                <div className="px-4 py-1.5 text-xs font-bold text-text-secondary uppercase tracking-widest">Actions</div>
-                {filteredActionCommands.map((item) => {
-                  const index = allItems.indexOf(item);
-                  const isSelected = index === selectedIndex;
-                  return (
-                    <div
-                      key={item.id}
-                      className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors ${isSelected ? 'bg-surface-200 border-l-2 border-accent' : 'border-l-2 border-transparent hover:bg-surface-100'}`}
-                      onClick={() => executeAction(item)}
-                      onMouseEnter={() => setSelectedIndex(index)}
-                    >
-                      <item.icon size={16} className={isSelected ? (item.destructive ? 'text-rose' : 'text-text') : 'text-text-muted'} />
-                      <span className={`text-sm font-medium ${isSelected ? (item.destructive ? 'text-rose' : 'text-text') : 'text-text-secondary'}`}>{item.label}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* User Search Results */}
-            {searchResults.length > 0 && (
-              <div className="mb-2">
-                <div className="px-4 py-1.5 text-xs font-bold text-text-secondary uppercase tracking-widest flex items-center gap-1.5">
-                  <Users size={12} /> Orbital Network
+            {/* Results */}
+            <div className="overflow-y-auto charged-scrollbar py-2">
+              {allItems.length === 0 && (
+                <div className="px-4 py-8 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
+                  No results found for &quot;{query}&quot;
                 </div>
-                {searchResults.map((user) => {
-                  // Find the user in allItems list by matching _id for selection state
-                  const userItem = allItems.find(i => i.type === 'user' && i._id === user._id);
-                  const index = allItems.indexOf(userItem);
-                  const isSelected = index === selectedIndex;
-                  return (
-                    <div
-                      key={user._id}
-                      className={`flex items-center justify-between px-4 py-2.5 cursor-pointer transition-colors ${isSelected ? 'bg-surface-200 border-l-2 border-accent' : 'border-l-2 border-transparent hover:bg-surface-100'}`}
-                      onClick={() => executeAction(userItem)}
-                      onMouseEnter={() => setSelectedIndex(index)}
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <Avatar src={user.profilePic} name={user.fullName} size="sm" />
-                        <div className="min-w-0">
-                          <div className={`font-medium text-sm truncate ${isSelected ? 'text-text' : 'text-text-secondary'}`}>{user.fullName}</div>
-                          <div className="text-xs text-text-muted truncate font-mono">@{user.username}</div>
+              )}
+
+              {filteredNavCommands.length > 0 && (
+                <div className="mb-2">
+                  <div className="px-4 py-1.5 text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Navigation</div>
+                  {filteredNavCommands.map((item) => {
+                    const index = allItems.indexOf(item);
+                    const isSelected = index === selectedIndex;
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors"
+                        style={{
+                          background: isSelected ? 'var(--elevated)' : 'transparent',
+                          borderLeft: isSelected ? '2px solid var(--accent-base)' : '2px solid transparent',
+                        }}
+                        onClick={() => executeAction(item)}
+                        onMouseEnter={() => setSelectedIndex(index)}
+                      >
+                        <item.icon size={16} style={{ color: isSelected ? 'var(--text-primary)' : 'var(--text-muted)' }} />
+                        <span className="text-sm font-medium" style={{ color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{item.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {filteredActionCommands.length > 0 && (
+                <div className="mb-2">
+                  <div className="px-4 py-1.5 text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Actions</div>
+                  {filteredActionCommands.map((item) => {
+                    const index = allItems.indexOf(item);
+                    const isSelected = index === selectedIndex;
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors"
+                        style={{
+                          background: isSelected ? 'var(--elevated)' : 'transparent',
+                          borderLeft: isSelected ? '2px solid var(--accent-base)' : '2px solid transparent',
+                        }}
+                        onClick={() => executeAction(item)}
+                        onMouseEnter={() => setSelectedIndex(index)}
+                      >
+                        <item.icon size={16} style={{ color: isSelected ? (item.destructive ? 'var(--danger)' : 'var(--text-primary)') : 'var(--text-muted)' }} />
+                        <span className="text-sm font-medium" style={{ color: isSelected ? (item.destructive ? 'var(--danger)' : 'var(--text-primary)') : 'var(--text-secondary)' }}>{item.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {searchResults.length > 0 && (
+                <div className="mb-2">
+                  <div className="px-4 py-1.5 text-xs font-bold uppercase tracking-widest flex items-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
+                    <Users size={12} /> Orbital Network
+                  </div>
+                  {searchResults.map((user) => {
+                    const userItem = allItems.find(i => i.type === 'user' && i._id === user._id);
+                    const index = allItems.indexOf(userItem);
+                    const isSelected = index === selectedIndex;
+                    return (
+                      <div
+                        key={user._id}
+                        className="flex items-center justify-between px-4 py-2.5 cursor-pointer transition-colors"
+                        style={{
+                          background: isSelected ? 'var(--elevated)' : 'transparent',
+                          borderLeft: isSelected ? '2px solid var(--accent-base)' : '2px solid transparent',
+                        }}
+                        onClick={() => executeAction(userItem)}
+                        onMouseEnter={() => setSelectedIndex(index)}
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <Avatar src={user.profilePic} name={user.fullName} size="sm" />
+                          <div className="min-w-0">
+                            <div className="font-medium text-sm truncate" style={{ color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{user.fullName}</div>
+                            <div className="text-xs truncate font-mono" style={{ color: 'var(--text-muted)' }}>@{user.username}</div>
+                          </div>
                         </div>
+                        <div>{renderUserAction(user)}</div>
                       </div>
-                      <div>
-                        {renderUserAction(user)}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
 
-          {/* Footer */}
-          <div className="px-4 py-2.5 bg-surface/80 border-t border-default flex items-center gap-4 text-[10px] text-text-muted font-mono">
-            <span className="flex items-center gap-1"><span className="px-1.5 py-0.5 rounded bg-surface-200 border border-default">↑↓</span> to navigate</span>
-            <span className="flex items-center gap-1"><span className="px-1.5 py-0.5 rounded bg-surface-200 border border-default">↵</span> to select</span>
-          </div>
-
-        </motion.div>
+            {/* Footer */}
+            <div className="px-4 py-2.5 flex items-center gap-4 text-[10px] font-mono" style={{ borderTop: '1px solid var(--border)', color: 'var(--text-muted)' }}>
+              <span className="flex items-center gap-1">
+                <span className="px-1.5 py-0.5 rounded" style={{ background: 'var(--elevated)', border: '1px solid var(--border)' }}>↑↓</span> to navigate
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="px-1.5 py-0.5 rounded" style={{ background: 'var(--elevated)', border: '1px solid var(--border)' }}>↵</span> to select
+              </span>
+            </div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>

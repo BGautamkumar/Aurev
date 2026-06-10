@@ -12,7 +12,7 @@ const PasswordStrength = ({ password }) => {
 
     if (score <= 1) return { score: 1, label: 'Weak', color: 'bg-rose' };
     if (score <= 2) return { score: 2, label: 'Fair', color: 'bg-amber' };
-    if (score <= 3) return { score: 3, label: 'Good', color: 'bg-cyan' };
+    if (score <= 3) return { score: 3, label: 'Good', color: 'bg-accent' };
     if (score <= 4) return { score: 4, label: 'Strong', color: 'bg-emerald' };
     return { score: 5, label: 'Excellent', color: 'bg-accent' };
   };
@@ -38,7 +38,7 @@ const PasswordStrength = ({ password }) => {
         'text-xs transition-colors',
         strength.score <= 1 ? 'text-rose' :
         strength.score <= 2 ? 'text-amber' :
-        strength.score <= 3 ? 'text-cyan' :
+        strength.score <= 3 ? 'text-accent' :
         strength.score <= 4 ? 'text-emerald' : 'text-accent'
       )}>
         {strength.label}
